@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
       });
 
       this_thread::sleep_for(chrono::milliseconds(77));
-      server.publish("work");
+      server.publish_data("work");
     }
   });
 
