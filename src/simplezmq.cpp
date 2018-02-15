@@ -5,13 +5,13 @@
 using namespace std;
 
 namespace simplezmq {
-  Server::Server() :
+  Server::Server(int pub_port, int ctrl_port) :
     _context(),
     _reply_socket(_context, ZMQ_REP),
     _pub_socket(_context, ZMQ_PUB) {
 
-    _pub_socket.bind("tcp://*:5554");
-    _reply_socket.bind("tcp://*:5555");
+    _pub_socket.bind("tcp://*:" + to_string(pub_port));
+    _reply_socket.bind("tcp://*:" + to_string(ctrl_port));
   }
 
   bool Server::check_for_request(function<string(const string&)> handler) {
@@ -34,7 +34,7 @@ namespace simplezmq {
     _pub_socket.send(payload.data(), payload.size());
   }
 
-  Client::Client() :
+  Client::Client(const string& server_address, int sub_port, int ctrl_port) :
     _context(),
     _request_socket(_context, ZMQ_REQ),
     _sub_socket(_context, ZMQ_SUB) {
@@ -42,8 +42,8 @@ namespace simplezmq {
     _sub_socket.setsockopt(ZMQ_SUBSCRIBE, "", 0);
     _sub_socket.setsockopt(ZMQ_CONFLATE, 1);
 
-    _sub_socket.connect("tcp://localhost:5554");
-    _request_socket.connect("tcp://localhost:5555");
+    _sub_socket.connect("tcp://" + server_address + ":" + to_string(sub_port));
+    _request_socket.connect("tcp://" + server_address + ":" + to_string(ctrl_port));
   }
 
   string Client::request(const string& payload) {
@@ -65,7 +65,5 @@ namespace simplezmq {
     }
     return {};
   }
-
-
 }
 
