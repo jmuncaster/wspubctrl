@@ -7,8 +7,8 @@ using namespace std;
 namespace simplezmq {
   Server::Server(int pub_port, int ctrl_port) :
     _context(),
-    _reply_socket(_context, ZMQ_REP),
-    _pub_socket(_context, ZMQ_PUB) {
+    _pub_socket(_context, ZMQ_PUB),
+    _reply_socket(_context, ZMQ_REP) {
 
     _pub_socket.bind("tcp://*:" + to_string(pub_port));
     _reply_socket.bind("tcp://*:" + to_string(ctrl_port));
@@ -36,11 +36,11 @@ namespace simplezmq {
 
   Client::Client(const string& server_address, int sub_port, int ctrl_port) :
     _context(),
-    _request_socket(_context, ZMQ_REQ),
-    _sub_socket(_context, ZMQ_SUB) {
+    _sub_socket(_context, ZMQ_SUB),
+    _request_socket(_context, ZMQ_REQ) {
 
-    _sub_socket.setsockopt(ZMQ_SUBSCRIBE, "", 0);
-    _sub_socket.setsockopt(ZMQ_CONFLATE, 1);
+    _sub_socket.setsockopt(ZMQ_SUBSCRIBE, "", 0); // Accept everything
+    _sub_socket.setsockopt(ZMQ_CONFLATE, 1);      // Drop old messages
 
     _sub_socket.connect("tcp://" + server_address + ":" + to_string(sub_port));
     _request_socket.connect("tcp://" + server_address + ":" + to_string(ctrl_port));

@@ -18,8 +18,8 @@ namespace simplezmq {
 
     private:
       zmq::context_t _context;
-      zmq::socket_t _reply_socket;
       zmq::socket_t _pub_socket;
+      zmq::socket_t _reply_socket;
   };
 
   class Client {
@@ -30,7 +30,7 @@ namespace simplezmq {
 
     private:
       zmq::context_t _context;
-      zmq::socket_t _request_socket;
       zmq::socket_t _sub_socket;
+      zmq::socket_t _request_socket;
   };
 }
