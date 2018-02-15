@@ -2,14 +2,14 @@
 
 #include <zmq.hpp>
 
+#include <functional>
 #include <memory>
 
 namespace simplezmq {
   class Server {
     public:
       Server();
-      bool get_request(std::string& payload);
-      void reply(const std::string& payload);
+      bool check_for_request(std::function<std::string(const std::string&)> handler);
       //void publish_data(const std::string& data);
 
     private:

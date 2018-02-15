@@ -1,5 +1,3 @@
-#pragma once
-
 #include "simplezmq.hpp"
 
 #include <vector>
@@ -14,7 +12,7 @@ namespace simplezmq {
     _reply_socket.bind("tcp://*:5555");
   }
 
-  bool Server::get_request(std::string& payload) {
+  bool Server::check_for_request(function<string(const string&)> handler) {
     //  Initialize poll set
     vector<zmq::pollitem_t> items {
         { (void*)_reply_socket, 0, ZMQ_POLLIN, 0 },
@@ -24,16 +22,14 @@ namespace simplezmq {
       if (items[0].revents & ZMQ_POLLIN) {
         zmq::message_t msg;
         _reply_socket.recv(&msg);
-        payload = string(static_cast<char*>(msg.data()), msg.size());
+        string request_payload(static_cast<char*>(msg.data()), msg.size());
+        string reply_payload = handler(request_payload);
+        _reply_socket.send(reply_payload.data(), reply_payload.size());
         return true;
       }
     }
 
     return false;
-  }
-
-  void Server::reply(const std::string& payload) {
-    _reply_socket.send(payload.data(), payload.size());
   }
 
   Client::Client() :

@@ -19,12 +19,12 @@ int main(int argc, char* argv[]) {
     simplezmq::Server server;
 
     while (!quit) {
-      string request;
-      if (server.get_request(request)) {
+      server.check_for_request([&](const string& request) {
         cout << "[Server] Received request: " << request << endl;
-        server.reply("World!");
-      }
-      this_thread::sleep_for(chrono::milliseconds(1000));
+        return "World!";
+      });
+      cout << "[Server] work..." << endl;
+      this_thread::sleep_for(chrono::milliseconds(77));
     }
   });
 
@@ -32,9 +32,11 @@ int main(int argc, char* argv[]) {
     simplezmq::Client client;
 
     while (!quit) {
+      cout << "[Client] Sent request" << endl;
       string reply = client.request("Hello");
       cout << "[Client] Received reply: " << reply << endl;
-      this_thread::sleep_for(chrono::milliseconds(100));
+      cout << "[Client] work..." << endl;
+      this_thread::sleep_for(chrono::milliseconds(500));
     }
   });
 
