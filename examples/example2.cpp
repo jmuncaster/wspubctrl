@@ -23,19 +23,25 @@ int main(int argc, char* argv[]) {
         cout << "[Server] Received request: " << request << endl;
         return "World!";
       });
-      cout << "[Server] work..." << endl;
+
       this_thread::sleep_for(chrono::milliseconds(77));
+      server.publish("work");
     }
   });
 
   thread client_thread([&]() {
     simplezmq::Client client;
 
+    int iter = 0;
     while (!quit) {
-      string reply = client.request("Hello");
-      cout << "[Client] Received reply: " << reply << endl;
-      cout << "[Client] work..." << endl;
-      this_thread::sleep_for(chrono::milliseconds(500));
+      if (iter % 10 == 0) {
+        string reply = client.request("Hello");
+        cout << "[Client] Received reply: " << reply << endl;
+      }
+
+      string data = client.wait_for_data();
+      cout << "[Client] Got data: " << data << endl;
+      ++iter;
     }
   });
 

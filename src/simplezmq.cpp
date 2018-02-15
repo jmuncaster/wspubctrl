@@ -7,17 +7,15 @@ using namespace std;
 namespace simplezmq {
   Server::Server() :
     _context(),
-    _reply_socket(_context, ZMQ_REP) {
+    _reply_socket(_context, ZMQ_REP),
+    _pub_socket(_context, ZMQ_PUB) {
 
+    _pub_socket.bind("tcp://*:5554");
     _reply_socket.bind("tcp://*:5555");
   }
 
   bool Server::check_for_request(function<string(const string&)> handler) {
-    //  Initialize poll set
-    vector<zmq::pollitem_t> items {
-        { (void*)_reply_socket, 0, ZMQ_POLLIN, 0 },
-    };
-
+    vector<zmq::pollitem_t> items {{(void*)_reply_socket, 0, ZMQ_POLLIN, 0}};
     if (zmq::poll(items, 0)) {
       if (items[0].revents & ZMQ_POLLIN) {
         zmq::message_t msg;
@@ -32,10 +30,19 @@ namespace simplezmq {
     return false;
   }
 
+  void Server::publish(const string& payload) {
+    _pub_socket.send(payload.data(), payload.size());
+  }
+
   Client::Client() :
     _context(),
-    _request_socket(_context, ZMQ_REQ) {
+    _request_socket(_context, ZMQ_REQ),
+    _sub_socket(_context, ZMQ_SUB) {
 
+    _sub_socket.setsockopt(ZMQ_SUBSCRIBE, "", 0);
+    _sub_socket.setsockopt(ZMQ_CONFLATE, 1);
+
+    _sub_socket.connect("tcp://localhost:5554");
     _request_socket.connect("tcp://localhost:5555");
   }
 
@@ -45,6 +52,20 @@ namespace simplezmq {
     _request_socket.recv(&msg);
     return string(static_cast<char*>(msg.data()), msg.size());
   }
+
+  string Client::wait_for_data(int timeout_ms) {
+    vector<zmq::pollitem_t> items {{(void*)_sub_socket, 0, ZMQ_POLLIN, 0}};
+    if (zmq::poll(items, timeout_ms)) {
+      if (items[0].revents & ZMQ_POLLIN) {
+        zmq::message_t msg;
+        _sub_socket.recv(&msg);
+        string payload(static_cast<char*>(msg.data()), msg.size());
+        return payload;
+      }
+    }
+    return {};
+  }
+
 
 }
 
