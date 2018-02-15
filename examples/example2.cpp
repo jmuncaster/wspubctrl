@@ -18,21 +18,31 @@ int main(int argc, char* argv[]) {
   thread server_thread([&]() {
     simplezmq::Server server;
 
+    cout << "[Server] Waiting to be started..." << endl;
+    server.wait_for_request();
+
     while (!quit) {
-      server.check_for_request([&](const string& request) {
+
+      // Check for ctrl request
+      server.wait_for_request(0, [&](const string& request) {
         cout << "[Server] Received request: " << request << endl;
         return "World!";
       });
 
+      // Do some 'work'
       this_thread::sleep_for(chrono::milliseconds(77));
       server.publish_data("work");
     }
   });
 
+  this_thread::sleep_for(chrono::seconds(1));
+
   thread client_thread([&]() {
     simplezmq::Client client;
 
-    int iter = 0;
+    client.request("Start");
+
+    int iter = 1;
     while (!quit) {
       if (iter % 10 == 0) {
         string reply = client.request("Hello");

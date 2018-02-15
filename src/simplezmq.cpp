@@ -27,14 +27,17 @@ namespace simplezmq {
   Server::~Server() { // Required for pimpl pattern
   }
 
-  bool Server::check_for_request(function<string(const string&)> request_handler) {
+  bool Server::wait_for_request(int timeout_ms, function<string(const string&)> request_handler) {
     vector<zmq::pollitem_t> items {{(void*)_detail->_reply_socket, 0, ZMQ_POLLIN, 0}};
-    if (zmq::poll(items, 0)) {
+    if (zmq::poll(items, timeout_ms)) {
       if (items[0].revents & ZMQ_POLLIN) {
         zmq::message_t msg;
         _detail->_reply_socket.recv(&msg);
         string request_payload(static_cast<char*>(msg.data()), msg.size());
-        string reply_payload = request_handler(request_payload);
+        string reply_payload;
+        if (request_handler) {
+          reply_payload = request_handler(request_payload);
+        }
         _detail->_reply_socket.send(reply_payload.data(), reply_payload.size());
         return true;
       }
