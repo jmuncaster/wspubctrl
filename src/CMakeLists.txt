@@ -1,0 +1,5 @@
+find_package(ZMQ REQUIRED)
+add_library(simplezmq simplezmq.cpp simplezmq.hpp)
+target_include_directories(simplezmq PRIVATE ${ZMQ_INCLUDE_DIRS})
+target_include_directories(simplezmq INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(simplezmq ${ZMQ_LIBRARIES})
