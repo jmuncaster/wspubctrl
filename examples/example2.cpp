@@ -32,7 +32,6 @@ int main(int argc, char* argv[]) {
     simplezmq::Client client;
 
     while (!quit) {
-      cout << "[Client] Sent request" << endl;
       string reply = client.request("Hello");
       cout << "[Client] Received reply: " << reply << endl;
       cout << "[Client] work..." << endl;
