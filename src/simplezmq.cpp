@@ -20,6 +20,8 @@ namespace simplezmq {
   Server::Server(int pub_port, int ctrl_port) :
     _detail(new Detail) {
 
+    _detail->_pub_socket.setsockopt(ZMQ_SNDHWM, 1);
+
     _detail->_pub_socket.bind("tcp://*:" + to_string(pub_port));
     _detail->_reply_socket.bind("tcp://*:" + to_string(ctrl_port));
   }
