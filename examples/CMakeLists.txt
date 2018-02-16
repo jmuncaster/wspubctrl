@@ -1,5 +1,2 @@
-add_executable(example example.cpp)
-target_link_libraries(example zpubctrl pthread)
-
-add_executable(example2 example2.cpp)
-target_link_libraries(example2 zpubctrl pthread)
+add_executable(pubctrl_example pubctrl_example.cpp)
+target_link_libraries(pubctrl_example zpubctrl pthread)
