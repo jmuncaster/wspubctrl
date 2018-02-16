@@ -38,7 +38,7 @@ namespace zpubctrl {
         return payload;
       }
     }
-    return {};
+    return "";
   }
 
 }

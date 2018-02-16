@@ -17,7 +17,7 @@ namespace zpubctrl {
       // @param request_handler: Callback that is called if and only if there is a request.
       // @returns true if a request was handled.
       typedef std::function<std::string(const std::string&)> request_callback_t;
-      bool wait_for_request(int timeout_ms = -1, request_callback_t request_handler = nullptr);
+      bool wait_for_request(int timeout_ms = forever, request_callback_t request_handler = nullptr);
 
       // Publish a message to the pub socket
       void publish_data(const std::string& payload);

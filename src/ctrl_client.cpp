@@ -36,7 +36,7 @@ namespace zpubctrl {
         return string(static_cast<char*>(msg.data()), msg.size());
       }
       else {
-        throw runtime_error("connection state changed");
+        throw runtime_error("error while waiting for request");
       }
     }
     else {
