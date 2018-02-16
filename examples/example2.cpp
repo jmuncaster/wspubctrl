@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
   atomic<bool> quit(false);
 
   thread server_thread([&]() {
-    simplezmq::Server server;
+    zpubctrl::Server server;
 
     cout << "[Server] Waiting for start message..." << endl;
     server.wait_for_request();
@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
   thread client_thread([&]() {
 
     thread sub_thread([&]() {
-      simplezmq::SubClient client;
+      zpubctrl::SubClient client;
       while (!quit) {
         string data = client.wait_for_data();
         cout << "[Sub    " << get_ts() << "] data: " << data << endl;
@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
     });
 
     thread ctrl_thread([&]() {
-      simplezmq::CtrlClient client;
+      zpubctrl::CtrlClient client;
       client.request("start");
       while (!quit) {
         try {

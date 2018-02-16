@@ -4,12 +4,12 @@
 #include <memory>
 #include <string>
 
-namespace simplezmq {
+namespace zpubctrl {
 
   constexpr int default_data_port = 5554;
   constexpr int default_ctrl_port = 5555;
 
-  // Server for publishing a data stream and accepting control requests.
+  // Server publishes data stream and accepts synchronous control requests.
   class Server {
     public:
       Server(int pub_port = default_data_port, int ctrl_port = default_ctrl_port);

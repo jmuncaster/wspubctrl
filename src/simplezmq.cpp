@@ -6,7 +6,7 @@
 
 using namespace std;
 
-namespace simplezmq {
+namespace zpubctrl {
   struct Server::Detail {
     Detail() :
       _context(),
