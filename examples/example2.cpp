@@ -22,24 +22,22 @@ void server_entry() {
 
   cout << "[Server] Waiting for start message..." << endl;
   server.wait_for_request();
-  bool do_work = true;
+  string server_data = "";
 
   while (!server_quit) {
     // Check for ctrl request
-    bool got_request = server.wait_for_request(0, [&](const string& request) {
+    server.wait_for_request(0, [&](const string& request) {
       cout << "[Server " << get_ts() << "]  req: " << request << endl;
-      do_work = !do_work;
-      string reply = get_ts() + (do_work ? "do_work is true" : "do_work is false");
+      server_data = "DATA(" + request + ")";
+      string reply = server_data;
       cout << "[Server " << get_ts() << "]  rep: " << reply << endl;
       return reply;
     });
 
-    // Do some 'work'
+    // Do some 'work' and publish
     this_thread::sleep_for(milliseconds(100));
-    string data = get_ts() + (do_work ? "work" : "no-op");
-    cout << "[Server " << get_ts() << "] data: " << data << endl;
-
-    server.publish_data(data);
+    cout << "[Server " << get_ts() << "] data: " << server_data << endl;
+    server.publish_data(server_data);
   }
   cout << "[Server " << get_ts() << "] thrd: quit" << endl;
 }
@@ -54,11 +52,12 @@ void sub_client_entry() {
 }
 
 void ctrl_client_entry() {
+  int iter = 0;
   zpubctrl::CtrlClient client;
-  client.request("start");
+  client.request(to_string(iter));
   while (!client_quit) {
     try {
-      string request = get_ts() + "toggle do_work";
+      string request = to_string(++iter);
       cout << "[Ctrl   " << get_ts() << "]  req: " << request << endl;
       string reply = client.request(request);
       cout << "[Ctrl   " << get_ts() << "]  rep: " << reply << endl;
