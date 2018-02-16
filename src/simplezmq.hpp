@@ -30,19 +30,30 @@ namespace simplezmq {
   };
 
   // Client for subscribing to a data stream and synchronously issuing control requests.
-  class Client {
+  class SubClient {
     public:
-      Client(const std::string& server_address = "localhost", int sub_port = default_data_port, int ctrl_port = default_ctrl_port);
-      ~Client();
-
-      // Synchronously issue a request and wait for the reply.
-      // @returns contents of reply
-      std::string request(const std::string& payload);
+      SubClient(const std::string& server_address = "localhost", int sub_port = default_data_port);
+      ~SubClient();
 
       // Polls subscription for data
       // @param timeout_ms: Wait for this long for data. -1 means wait forever.
       // @returns received data, or empty string on timeout
       std::string wait_for_data(int timeout_ms = -1);
+
+    private:
+      struct Detail;
+      std::unique_ptr<Detail> _detail;
+  };
+
+  // Client for subscribing to a data stream and synchronously issuing control requests.
+  class CtrlClient {
+    public:
+      CtrlClient(const std::string& server_address = "localhost", int ctrl_port = default_ctrl_port);
+      ~CtrlClient();
+
+      // Synchronously issue a request and wait for the reply.
+      // @returns contents of reply
+      std::string request(const std::string& payload, int timeout_ms = 5000);
 
     private:
       struct Detail;
