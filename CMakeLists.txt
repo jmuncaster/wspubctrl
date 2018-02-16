@@ -9,13 +9,13 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 add_subdirectory(src)
 
 # Examples and tests
-option(BUILD_JWS_EXAMPLES "Build examples" ON)
-if (BUILD_JWS_EXAMPLES)
+option(BUILD_ZPUBCTRL_EXAMPLES "Build examples" OFF)
+if (BUILD_ZPUBCTRL_EXAMPLES)
   add_subdirectory(examples)
 endif()
 
-option(BUILD_JWS_TESTS "Build tests" OFF)
-if (BUILD_JWS_TESTS)
+option(BUILD_ZPUBCTRL_TESTS "Build tests" OFF)
+if (BUILD_ZPUBCTRL_TESTS)
   enable_testing()
   add_subdirectory(tests)
 endif()
