@@ -17,12 +17,15 @@ string get_ts() {
   return to_string(duration_cast<milliseconds>(dt).count()) + " ";
 }
 
+// Main server process runs a program loop, publishes feed, and checks for control messages
 void server_entry() {
+  cout << "[Server " + get_ts() + "] Waiting for start message..." << endl;
   zpubctrl::Server server;
-
-  cout << "[Server] Waiting for start message..." << endl;
-  server.wait_for_request();
-  string server_data = "";
+  string server_data;
+  server.wait_for_request(-1, [&](const string& request) {
+    server_data = "DATA(" + request + ")";
+    return server_data;
+  });
 
   while (!server_quit) {
     // Check for ctrl request
@@ -42,19 +45,25 @@ void server_entry() {
   cout << "[Server " << get_ts() << "] thrd: quit" << endl;
 }
 
+// Subscribe thread just listens to the feed
 void sub_client_entry() {
   zpubctrl::SubClient client;
   while (!client_quit) {
-    string data = client.wait_for_data();
-    cout << "[Sub    " << get_ts() << "] data: " << data << endl;
+    string data = client.wait_for_data(1000);
+    if (!data.empty()) {
+      cout << "[Sub    " << get_ts() << "] data: " << data << endl;
+    }
+    else {
+      cout << "[Sub    " << get_ts() << "] timeout" << endl;
+    }
   }
   cout << "[Sub    " << get_ts() << "] thrd: quit" << endl;
 }
 
+// Control thread issue commands every few seconds
 void ctrl_client_entry() {
   int iter = 0;
   zpubctrl::CtrlClient client;
-  client.request(to_string(iter));
   while (!client_quit) {
     try {
       string request = to_string(++iter);
