@@ -2,7 +2,8 @@
 #include <atomic>
 #include <thread>
 
-#include "simplezmq.hpp"
+#include "server.hpp"
+#include "client.hpp"
 
 using namespace std;
 using namespace std::chrono;
