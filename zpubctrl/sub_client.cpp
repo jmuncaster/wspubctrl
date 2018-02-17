@@ -37,8 +37,11 @@ namespace zpubctrl {
         string payload(static_cast<char*>(msg.data()), msg.size());
         return payload;
       }
+      else {
+        throw runtime_error("socket error");
+      }
     }
-    return "";
+    throw runtime_error("timeout");
   }
 
 }
