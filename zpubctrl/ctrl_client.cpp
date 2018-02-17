@@ -36,11 +36,11 @@ namespace zpubctrl {
         return string(static_cast<char*>(msg.data()), msg.size());
       }
       else {
-        throw runtime_error("error while waiting for request");
+        throw runtime_error("socket error");
       }
     }
     else {
-      throw runtime_error("request timeout");
+      throw runtime_error("timeout");
     }
   }
 
