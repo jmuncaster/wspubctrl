@@ -1,8 +1,11 @@
-# JSON With Schema
+# ZeroMQ Publisher with Constrol Socket
 
-This library is a wrapper around [nlohmann/json](https://github.com/nlohmann/json/releases) for parsing
-JSON and [pboettch/json-schema-validator](https://github.com/pboettch/json-schema-validator) for validating
-JSON against a schema described by [JSON-Schema](http://json-schema.org) draft4.
+This library implements a simple network communication pattern. On the server-side, we implement a
+simple class with a *publish* socket for streaming and a *request-reply* control-socket for synchronous
+control messages. On the client-side we provide a simple class to *subscribe* to the published stream as
+well as issue synchronous requests to the control socket.
+
+The backend is implemented in [zeromq](http://zeromq.org) with a [C++ wrapper](https://github.com/zeromq/cppzmq).
 
 ## Getting Started
 
@@ -16,25 +19,32 @@ These instructions assume you are using [cmake](cmake.org).
 
 In your CMakeLists.txt, add:
 ```CMake
-add_subdirectory(path/to/jws jws)
+add_subdirectory(path/to/zpubctrl jws)
 add_executable(myapp main.cpp)
 target_link_libraries(myapp jws)
 ```
 
 ### Example
 
+Server:
 ```C++
-#include <jws/json_with_schema.hpp>
+#include <zpubctrl/server.hpp>
 #include <iostream>
 
 using namespace std;
 
 int main(int argc, char* argv[]) {
 
-  if (argc != 3) {
-    cout << "usage: validate_json <schema.json> <document.json>" << endl;
-    return 1;
+  zpubctrl::Server server;
+  int iter = 0;
+  while (true) {
+    server.wait_for_request(0, [&](const string& request) {
+      echo_reply = request;
+      return "OK";
+    });
   }
+
+  
 
   auto validator = load_validator(argv[1]);
   auto document = load_json(argv[2]);

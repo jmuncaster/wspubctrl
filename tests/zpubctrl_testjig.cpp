@@ -1,9 +1,8 @@
+#include <zpubctrl/server.hpp>
+#include <zpubctrl/client.hpp>
 #include <iostream>
 #include <atomic>
 #include <thread>
-
-#include "server.hpp"
-#include "client.hpp"
 
 using namespace std;
 using namespace std::chrono;

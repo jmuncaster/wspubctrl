@@ -1,4 +1,4 @@
-#include "client.hpp"
+#include <zpubctrl/client.hpp>
 #include <atomic>
 #include <iostream>
 #include <thread>

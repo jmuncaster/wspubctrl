@@ -1,4 +1,4 @@
-#include "server.hpp"
+#include <zpubctrl/server.hpp>
 #include <cstdlib>
 #include <iostream>
 #include <thread>
