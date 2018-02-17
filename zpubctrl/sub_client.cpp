@@ -12,7 +12,6 @@ namespace zpubctrl {
       _context(),
       _sub_socket(_context, ZMQ_SUB) {
     }
-
     zmq::context_t _context;
     zmq::socket_t _sub_socket;
   };

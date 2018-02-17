@@ -15,7 +15,7 @@ namespace zpubctrl {
 
       // Synchronously issue a request and wait for the reply.
       // @returns contents of reply
-      // @throws on error or timeout
+      // @throws on socket error or timeout
       std::string request(const std::string& payload, int timeout_ms = default_request_timeout_ms);
 
     private:

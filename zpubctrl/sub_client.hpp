@@ -14,7 +14,8 @@ namespace zpubctrl {
 
       // Polls subscription for data
       // @param timeout_ms: Wait for this long for data. -1 means wait forever.
-      // @returns received data, or empty string on timeout
+      // @returns received data
+      // @throws on socket error or timeout
       std::string wait_for_data(int timeout_ms = forever);
 
     private:
