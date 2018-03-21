@@ -13,6 +13,8 @@ namespace zpubctrl {
       CtrlClient(const std::string& server_address = default_host, int ctrl_port = default_ctrl_port);
       ~CtrlClient();
 
+      void start();
+
       // Synchronously issue a request and wait for the reply.
       // @returns contents of reply
       // @throws on socket error or timeout

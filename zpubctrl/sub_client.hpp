@@ -12,6 +12,8 @@ namespace zpubctrl {
       SubClient(const std::string& server_address = default_host, int sub_port = default_data_port);
       ~SubClient();
 
+      void start();
+
       // Polls subscription for data
       // @param timeout_ms: Wait for this long for data. -1 means wait forever.
       // @returns received data

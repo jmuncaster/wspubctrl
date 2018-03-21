@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
+add_subdirectory(Simple-WebSocket-Server)
+
 # zpubctrl library
 find_package(ZMQ REQUIRED)
 add_library(zpubctrl
@@ -19,7 +21,7 @@ add_library(zpubctrl
   zpubctrl/sub_client.hpp)
 target_include_directories(zpubctrl PRIVATE ${ZMQ_INCLUDE_DIRS})
 target_include_directories(zpubctrl INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(zpubctrl PUBLIC ${ZMQ_LIBRARIES})
+target_link_libraries(zpubctrl PUBLIC ${ZMQ_LIBRARIES} simple-websocket-server )
 
 # Examples and tests
 option(BUILD_ZPUBCTRL_EXAMPLES "Build examples" OFF)

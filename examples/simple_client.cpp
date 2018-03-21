@@ -17,6 +17,9 @@ int main(int argc, char* argv[]) {
   thread sub_thread([&]() {
     try {
       zpubctrl::SubClient sub_client;
+      thread sub_client_thread([&]() {
+        sub_client.start();
+      });
       while (!quit) {
         auto data = sub_client.wait_for_data(timeout_ms);
         cout << "\r" << data << "\e[K" << flush;
@@ -34,6 +37,9 @@ int main(int argc, char* argv[]) {
   // Main loop cycles through texts in response to user input
   try {
     zpubctrl::CtrlClient ctrl_client;
+    thread ctrl_client_thread([&]() {
+      ctrl_client.start();
+    });
     vector<string> texts = {"Bonjour!", "Next we will try the empty string", "", "This is the last text"};
     for (size_t i = 0; !quit && i < texts.size(); ++i) {
       auto reply = ctrl_client.request(texts[i % texts.size()], timeout_ms);

@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <thread>
+#include <algorithm>
 
 using namespace std;
 
@@ -12,6 +13,9 @@ int main(int argc, char** argv) {
   cout << "Start server" << endl;
   cout << "  * publish port: " << zpubctrl::default_data_port << endl;;
   cout << "  * control port: " << zpubctrl::default_ctrl_port << endl;;
+  thread server_thread([&]() {
+    server.start();
+  });
 
   string text = "Hello World!";
 
