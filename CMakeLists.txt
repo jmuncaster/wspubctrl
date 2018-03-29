@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.2.2)
 
-project(zpubctrl)
+project(wspubctrl)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -8,20 +8,20 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 add_subdirectory(Simple-WebSocket-Server)
 
-# zpubctrl library
+# wspubctrl library
 find_package(ZMQ REQUIRED)
-add_library(zpubctrl
-  zpubctrl/constants.hpp
-  zpubctrl/client.hpp
-  zpubctrl/ctrl_client.cpp
-  zpubctrl/ctrl_client.hpp
-  zpubctrl/server.cpp
-  zpubctrl/server.hpp
-  zpubctrl/sub_client.cpp
-  zpubctrl/sub_client.hpp)
-target_include_directories(zpubctrl PRIVATE ${ZMQ_INCLUDE_DIRS})
-target_include_directories(zpubctrl INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(zpubctrl PUBLIC ${ZMQ_LIBRARIES} simple-websocket-server )
+add_library(wspubctrl
+  wspubctrl/constants.hpp
+  wspubctrl/client.hpp
+  wspubctrl/ctrl_client.cpp
+  wspubctrl/ctrl_client.hpp
+  wspubctrl/server.cpp
+  wspubctrl/server.hpp
+  wspubctrl/sub_client.cpp
+  wspubctrl/sub_client.hpp)
+target_include_directories(wspubctrl PRIVATE ${ZMQ_INCLUDE_DIRS})
+target_include_directories(wspubctrl INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(wspubctrl PUBLIC ${ZMQ_LIBRARIES} simple-websocket-server )
 
 # Examples and tests
 option(BUILD_EXAMPLES "Build examples" OFF)
