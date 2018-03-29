@@ -24,12 +24,12 @@ target_include_directories(zpubctrl INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(zpubctrl PUBLIC ${ZMQ_LIBRARIES} simple-websocket-server )
 
 # Examples and tests
-option(BUILD_ZPUBCTRL_EXAMPLES "Build examples" OFF)
+option(BUILD_EXAMPLES "Build examples" OFF)
 if (BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
 
-option(BUILD_ZPUBCTRL_TESTS "Build tests" OFF)
+option(BUILD_TESTS "Build tests" OFF)
 if (BUILD_TESTS)
   enable_testing()
   add_subdirectory(tests)
