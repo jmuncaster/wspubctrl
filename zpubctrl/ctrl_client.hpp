@@ -10,10 +10,8 @@ namespace zpubctrl {
   // Client issues synchronous control requests.
   class CtrlClient {
     public:
-      CtrlClient(const std::string& server_address = default_host, int ctrl_port = default_ctrl_port);
+      CtrlClient(const std::string& ctrl_uri = default_ctrl_uri);
       ~CtrlClient();
-
-      void start();
 
       // Synchronously issue a request and wait for the reply.
       // @returns contents of reply

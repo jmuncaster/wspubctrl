@@ -3,6 +3,7 @@
 #include <vector>
 #include <mutex>
 #include <condition_variable>
+#include <thread>
 #include "client_ws.hpp"
 
 using namespace std;
@@ -16,13 +17,13 @@ typedef WsClient::SendStream SendStream;
 namespace zpubctrl {
 
   struct SubClient::Detail {
-    Detail() :
-      _client("localhost:8080/pub"),
-      _mutex(),
+    Detail(const string& pub_uri) :
+      _client(pub_uri),
+      _mtx(),
       _new_message(false),
       _payload() {
       _client.on_message = [this](ConnectionPtr connection, MessagePtr message) {
-        unique_lock<mutex> lock(_mutex);
+        unique_lock<mutex> lock(_mtx);
         _payload = message->string();
         _new_message = true;
         lock.unlock();
@@ -30,18 +31,40 @@ namespace zpubctrl {
       };
     }
 
+    void start_thread() {
+      _thread = thread([this]() {
+        for (;;) {
+          _client.start();
+          if (!_reconnect) {
+            break;
+          }
+          this_thread::sleep_for(chrono::milliseconds(1000));
+        }
+      });
+    }
+
+    void stop_thread() {
+      _reconnect = false;
+      _client.stop();
+      _thread.join();
+    }
+
     WsClient _client;
-    mutex _mutex;
+    mutex _mtx;
     bool _new_message;
     string _payload;
     condition_variable _cnd;
+    thread _thread;
+    bool _reconnect = true;
   };
 
-  SubClient::SubClient(const string& server_address, int sub_port) :
-    _detail(new Detail) {
+  SubClient::SubClient(const string& pub_uri) :
+    _detail(new Detail(pub_uri)) {
+    _detail->start_thread();
   }
 
   SubClient::~SubClient() { // Required for pimpl pattern
+    _detail->stop_thread();
   }
 
   void SubClient::start() {
@@ -49,13 +72,19 @@ namespace zpubctrl {
   }
 
   string SubClient::wait_for_data(int timeout_ms) {
-    unique_lock<mutex> lock(_detail->_mutex);
-    if (_detail->_cnd.wait_for(lock, chrono::milliseconds(timeout_ms), [this]() { return _detail->_new_message; })) {
+    unique_lock<mutex> lock(_detail->_mtx);
+    if (timeout_ms == forever) {
+      _detail->_cnd.wait(lock, [this]() { return _detail->_new_message; });
       _detail->_new_message = false;
       return _detail->_payload;
-    };
-    throw runtime_error("timeout");
+    }
+    else if (_detail->_cnd.wait_for(lock, chrono::milliseconds(timeout_ms), [this]() { return _detail->_new_message; })) {
+      _detail->_new_message = false;
+      return _detail->_payload;
+    }
+    else {
+      throw runtime_error("timeout");
+    }
   }
-
 }
 

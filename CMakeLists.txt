@@ -25,12 +25,12 @@ target_link_libraries(zpubctrl PUBLIC ${ZMQ_LIBRARIES} simple-websocket-server )
 
 # Examples and tests
 option(BUILD_ZPUBCTRL_EXAMPLES "Build examples" OFF)
-if (BUILD_ZPUBCTRL_EXAMPLES)
+if (BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
 
 option(BUILD_ZPUBCTRL_TESTS "Build tests" OFF)
-if (BUILD_ZPUBCTRL_TESTS)
+if (BUILD_TESTS)
   enable_testing()
   add_subdirectory(tests)
 endif()

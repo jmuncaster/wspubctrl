@@ -10,7 +10,7 @@ namespace zpubctrl {
   // Server publishes data stream and accepts synchronous control requests.
   class Server {
     public:
-      Server(int pub_port = default_data_port, int ctrl_port = default_ctrl_port);
+      Server(int port = default_port);
       ~Server();
 
       void start();
