@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <thread>
+#include <algorithm>
 
 using namespace std;
 
@@ -10,8 +11,8 @@ int main(int argc, char** argv) {
 
   zpubctrl::Server server;
   cout << "Start server" << endl;
-  cout << "  * publish port: " << zpubctrl::default_data_port << endl;;
-  cout << "  * control port: " << zpubctrl::default_ctrl_port << endl;;
+  cout << "  * publish on " << zpubctrl::default_pub_uri << endl;;
+  cout << "  * control on " << zpubctrl::default_ctrl_uri << endl;;
 
   string text = "Hello World!";
 

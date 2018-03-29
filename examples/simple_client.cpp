@@ -1,16 +1,14 @@
-#include <zpubctrl/client.hpp>
 #include <atomic>
 #include <iostream>
 #include <thread>
 #include <vector>
+#include <zpubctrl/client.hpp>
 
 using namespace std;
 
 const int timeout_ms = 5000;
 
 int main(int argc, char* argv[]) {
-
-  cout << "Start client. Press ENTER to cycle through texts..." << endl;
 
   // Sub thread continuously reports the stream on the same line
   atomic<bool> quit(false);
@@ -24,16 +22,17 @@ int main(int argc, char* argv[]) {
     }
     catch (exception& e) {
       // probably a timeout
-      cerr << e.what() << endl;
+      cerr << "sub thread: " << e.what() << endl;
       quit = true; // kill app on next iteration
     }
   });
 
-  cin.get();
-
-  // Main loop cycles through texts in response to user input
   try {
     zpubctrl::CtrlClient ctrl_client;
+
+    // Main loop cycles through texts in response to user input
+    cout << "Start client. Press ENTER to issue commands to cycle through texts..." << endl;
+    cin.get();
     vector<string> texts = {"Bonjour!", "Next we will try the empty string", "", "This is the last text"};
     for (size_t i = 0; !quit && i < texts.size(); ++i) {
       auto reply = ctrl_client.request(texts[i % texts.size()], timeout_ms);
@@ -53,6 +52,7 @@ int main(int argc, char* argv[]) {
 
   quit = true;
   sub_thread.join();
+  cout << endl;
 
   return 0;
 }

@@ -9,8 +9,10 @@ namespace zpubctrl {
   // Client subscribes to a data stream
   class SubClient {
     public:
-      SubClient(const std::string& server_address = default_host, int sub_port = default_data_port);
+      SubClient(const std::string& pub_uri = default_pub_uri);
       ~SubClient();
+
+      void start();
 
       // Polls subscription for data
       // @param timeout_ms: Wait for this long for data. -1 means wait forever.
