@@ -1,2 +1,2 @@
-add_executable(zpubctrl_testjig zpubctrl_testjig.cpp)
-target_link_libraries(zpubctrl_testjig wspubctrl pthread)
+add_executable(wspubctrl_testjig wspubctrl_testjig.cpp)
+target_link_libraries(wspubctrl_testjig wspubctrl pthread)
