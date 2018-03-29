@@ -1,11 +1,11 @@
-# ZeroMQ Publisher with Control Socket
+# Websockets Publisher with Control Socket
 
 This library implements a simple network communication pattern. On the server-side, we implement a
 simple class with a *publish* socket for streaming and a *request-reply* control-socket for synchronous
 control messages. On the client-side we provide a simple class to *subscribe* to the published stream as
 well as issue synchronous requests to the control socket.
 
-The backend is implemented in [zeromq](http://zeromq.org) with a [C++ wrapper](https://github.com/zeromq/cppzmq).
+The backend is based on [Simple-Websocket-Server](https://github.com/eidheim/Simple-WebSocket-Server).
 
 ## Getting Started
 
@@ -40,8 +40,8 @@ int main(int argc, char** argv) {
 
   zpubctrl::Server server;
   cout << "Start server" << endl;
-  cout << "  * publish port: " << zpubctrl::default_data_port << endl;;
-  cout << "  * control port: " << zpubctrl::default_ctrl_port << endl;;
+  cout << "  * publish port: " << zpubctrl::default_pub_uri << endl;;
+  cout << "  * control port: " << zpubctrl::default_ctrl_uri << endl;;
 
   string text = "Hello World!";
 
