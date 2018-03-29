@@ -91,7 +91,7 @@ namespace zpubctrl {
       }
       auto send_stream = make_shared<SendStream>();
       *send_stream << reply_payload;
-      connection->send(send_stream, [&](const SimpleWeb::error_code& ec) {}, 130); // TODO: handle error
+      connection->send(send_stream, [&](const SimpleWeb::error_code& ec) {}); // TODO: handle error
       return true;
     }
 
@@ -102,7 +102,7 @@ namespace zpubctrl {
     auto send_stream = make_shared<SendStream>();
     *send_stream << payload;
     for (auto& subscriber : _detail->_subscribers) {
-      subscriber->send(send_stream, [&](const SimpleWeb::error_code& ec) {}, 130); // TODO: handle error
+      subscriber->send(send_stream, [&](const SimpleWeb::error_code& ec) {}); // TODO: handle error
     }
   }
 
