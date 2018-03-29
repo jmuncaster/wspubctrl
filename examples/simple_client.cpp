@@ -2,7 +2,7 @@
 #include <iostream>
 #include <thread>
 #include <vector>
-#include <zpubctrl/client.hpp>
+#include <wspubctrl/client.hpp>
 
 using namespace std;
 
@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
   atomic<bool> quit(false);
   thread sub_thread([&]() {
     try {
-      zpubctrl::SubClient sub_client;
+      wspubctrl::SubClient sub_client;
       while (!quit) {
         auto data = sub_client.wait_for_data(timeout_ms);
         cout << "\r" << data << "\e[K" << flush;
@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
   });
 
   try {
-    zpubctrl::CtrlClient ctrl_client;
+    wspubctrl::CtrlClient ctrl_client;
 
     // Main loop cycles through texts in response to user input
     cout << "Start client. Press ENTER to issue commands to cycle through texts..." << endl;

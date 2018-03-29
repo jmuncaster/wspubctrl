@@ -19,16 +19,16 @@ These instructions assume you are using [cmake](cmake.org) and you have installe
 
 In your CMakeLists.txt, add:
 ```CMake
-add_subdirectory(path/to/zpubctrl zpubctrl)
+add_subdirectory(path/to/wspubctrl wspubctrl)
 add_executable(myapp main.cpp)
-target_link_libraries(myapp zpubctrl)
+target_link_libraries(myapp wspubctrl)
 ```
 
 ### Example
 
 Server:
 ```C++
-#include <zpubctrl/server.hpp>
+#include <wspubctrl/server.hpp>
 #include <cstdlib>
 #include <iostream>
 #include <thread>
@@ -38,10 +38,10 @@ using namespace std;
 // Main server process runs a program loop, publishes feed, and checks for control messages
 int main(int argc, char** argv) {
 
-  zpubctrl::Server server;
+  wspubctrl::Server server;
   cout << "Start server" << endl;
-  cout << "  * publish port: " << zpubctrl::default_pub_uri << endl;;
-  cout << "  * control port: " << zpubctrl::default_ctrl_uri << endl;;
+  cout << "  * publish port: " << wspubctrl::default_pub_uri << endl;;
+  cout << "  * control port: " << wspubctrl::default_ctrl_uri << endl;;
 
   string text = "Hello World!";
 
@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
 
 Client:
 ```C++
-#include <zpubctrl/client.hpp>
+#include <wspubctrl/client.hpp>
 #include <atomic>
 #include <iostream>
 #include <thread>
@@ -93,7 +93,7 @@ int main(int argc, char* argv[]) {
   atomic<bool> quit(false);
   thread sub_thread([&]() {
     try {
-      zpubctrl::SubClient sub_client;
+      wspubctrl::SubClient sub_client;
       while (!quit) {
         auto data = sub_client.wait_for_data(timeout_ms);
         cout << "\r" << data << "\e[K" << flush;
@@ -110,7 +110,7 @@ int main(int argc, char* argv[]) {
 
   // Main loop cycles through texts in response to user input
   try {
-    zpubctrl::CtrlClient ctrl_client;
+    wspubctrl::CtrlClient ctrl_client;
     vector<string> texts = {"Bonjour!", "Next we will try the empty string", "", "This is the last text"};
     for (size_t i = 0; !quit && i < texts.size(); ++i) {
       auto reply = ctrl_client.request(texts[i % texts.size()], timeout_ms);

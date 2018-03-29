@@ -1,6 +1,4 @@
-find_package(ZMQ REQUIRED)
-
-add_library(zpubctrl
+add_library(wspubctrl
   constants.hpp
   client.hpp
   ctrl_client.cpp
@@ -10,6 +8,5 @@ add_library(zpubctrl
   sub_client.cpp
   sub_client.hpp)
 
-target_include_directories(zpubctrl PRIVATE ${ZMQ_INCLUDE_DIRS})
-target_include_directories(zpubctrl INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(zpubctrl ${ZMQ_LIBRARIES})
+target_include_directories(wspubctrl INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(wspubctrl)

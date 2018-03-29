@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 
-namespace zpubctrl {
+namespace wspubctrl {
 
   // Client subscribes to a data stream
   class SubClient {

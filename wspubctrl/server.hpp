@@ -5,7 +5,7 @@
 #include <memory>
 #include <string>
 
-namespace zpubctrl {
+namespace wspubctrl {
 
   // Server publishes data stream and accepts synchronous control requests.
   class Server {

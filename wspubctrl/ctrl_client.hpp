@@ -5,7 +5,7 @@
 #include <memory>
 #include <string>
 
-namespace zpubctrl {
+namespace wspubctrl {
 
   // Client issues synchronous control requests.
   class CtrlClient {

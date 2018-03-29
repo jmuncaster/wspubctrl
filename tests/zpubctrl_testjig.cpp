@@ -1,5 +1,5 @@
-#include <zpubctrl/server.hpp>
-#include <zpubctrl/client.hpp>
+#include <wspubctrl/server.hpp>
+#include <wspubctrl/client.hpp>
 #include <iostream>
 #include <atomic>
 #include <thread>
@@ -19,7 +19,7 @@ string get_ts() {
 // Main server process runs a program loop, publishes feed, and checks for control messages
 void server_entry() {
   cout << "[Server " + get_ts() + "] Waiting for start message..." << endl;
-  zpubctrl::Server server;
+  wspubctrl::Server server;
   string server_data;
   server.wait_for_request(-1, [&](const string& request) {
     server_data = "DATA(" + request + ")";
@@ -46,7 +46,7 @@ void server_entry() {
 
 // Subscribe thread just listens to the feed
 void sub_client_entry() {
-  zpubctrl::SubClient client;
+  wspubctrl::SubClient client;
   while (!client_quit) {
     string data = client.wait_for_data(1000);
     if (!data.empty()) {
@@ -62,7 +62,7 @@ void sub_client_entry() {
 // Control thread issue commands every few seconds
 void ctrl_client_entry() {
   int iter = 0;
-  zpubctrl::CtrlClient client;
+  wspubctrl::CtrlClient client;
   while (!client_quit) {
     try {
       string request = to_string(++iter);

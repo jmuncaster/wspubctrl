@@ -18,7 +18,7 @@ typedef std::shared_ptr<WsServer::Connection> ConnectionPtr;
 typedef std::shared_ptr<WsServer::Message> MessagePtr;
 typedef WsServer::SendStream SendStream;
 
-namespace zpubctrl {
+namespace wspubctrl {
 
   struct Server::Detail {
     Detail(int port) :

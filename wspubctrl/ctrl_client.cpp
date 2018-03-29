@@ -14,7 +14,7 @@ typedef std::shared_ptr<WsClient::Connection> ConnectionPtr;
 typedef std::shared_ptr<WsClient::Message> MessagePtr;
 typedef WsClient::SendStream SendStream;
 
-namespace zpubctrl {
+namespace wspubctrl {
 
   namespace {
     enum class State { disconnected, connected, error};

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace zpubctrl {
+namespace wspubctrl {
   constexpr const char* default_host = "localhost";
   constexpr const char* default_pub_endpoint = "/pub";
   constexpr const char* default_ctrl_endpoint = "/ctrl";
