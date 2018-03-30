@@ -15,7 +15,7 @@ Dependencies:
 - Boost
 - OpenSSL
 
-On Windows, install openssl to the default location. Installer [here](https://slproweb.com/products/Win32OpenSSL.html). I use [Win64 OpenSSL v1.1.0h](https://slproweb.com/download/Win64OpenSSL-1_1_0h.exe).
+### Linux
 
 Build with [cmake](cmake.org).
 
@@ -31,6 +31,17 @@ or, add this as a submodule or take a snapshot of the repository and in your CMa
 add_subdirectory(path/to/wspubctrl wspubctrl)
 add_executable(myapp main.cpp)
 target_link_libraries(myapp wspubctrl)
+```
+
+### Windows
+
+- OpenSSL: Install openssl to the default location. Installer [here](https://slproweb.com/products/Win32OpenSSL.html). I use [Win64 OpenSSL v1.1.0h](https://slproweb.com/download/Win64OpenSSL-1_1_0h.exe).
+- Boost: See [boost.org](www.boost.org)
+
+```bash
+$ mkdir build && cd build
+$ cmake -G "Visual Studio 14 2015 Win64" -D BOOST_ROOT='C:\path\to\boost' -D BUILD_EXAMPLES=ON -D BUILD_TESTS=ON ..
+$ cmake --build .
 ```
 
 ### Example

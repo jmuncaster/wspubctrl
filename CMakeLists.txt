@@ -7,6 +7,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # websockets backend
 add_subdirectory(Simple-WebSocket-Server)
+if (WIN32)
+  target_compile_definitions(simple-websocket-server INTERFACE BOOST_ALL_NO_LIB)
+endif()
 
 # wspubctrl library
 add_library(wspubctrl
