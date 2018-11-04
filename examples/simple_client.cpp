@@ -15,6 +15,7 @@ int main(int argc, char* argv[]) {
   thread sub_thread([&]() {
     try {
       wspubctrl::SubClient sub_client;
+      sub_client.start();
       while (!quit) {
         auto data = sub_client.wait_for_data(timeout_ms);
         cout << "\r" << data << "\e[K" << flush;
