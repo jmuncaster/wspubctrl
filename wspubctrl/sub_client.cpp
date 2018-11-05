@@ -22,6 +22,7 @@ namespace wspubctrl {
       _mtx(),
       _new_message(false),
       _payload() {
+      cout << "pub_uri: " << pub_uri << endl;
       _client.on_message = [this](ConnectionPtr connection, MessagePtr message) {
         unique_lock<mutex> lock(_mtx);
         _payload = message->string();
@@ -60,7 +61,6 @@ namespace wspubctrl {
 
   SubClient::SubClient(const string& pub_uri) :
     _detail(new Detail(pub_uri)) {
-    _detail->start_thread();
   }
 
   SubClient::~SubClient() { // Required for pimpl pattern

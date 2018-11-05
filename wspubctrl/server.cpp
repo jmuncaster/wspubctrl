@@ -23,7 +23,6 @@ namespace wspubctrl {
   struct Server::Detail {
     Detail(int port) :
       _server(),
-      _pub_endpoints(),
       _ctrl_endpoint(_server.endpoint[default_ctrl_endpoint]) {
 
       add_publish_endpoint(default_pub_endpoint);
@@ -39,15 +38,20 @@ namespace wspubctrl {
     }
 
     void add_publish_endpoint(const std::string& path) {
-      _pub_endpoints[path] = &_server.endpoint[path];
-      auto& pub_endpoint = *_pub_endpoints[path];
-      pub_endpoint.on_open = [this, &path](ConnectionPtr connection) {
-        _subscribers[path].insert(connection);
+      cout << "publish: " << path << endl;
+      auto& pub_endpoint = _server.endpoint[path];
+      pub_endpoint.on_open = [this, path](ConnectionPtr connection) {
+        auto& subscribers = _subscribers[path];
+        subscribers.insert(connection);
+        cout << "add subscriber to " << path << ": " << subscribers.size() << endl;
       };
 
-      pub_endpoint.on_close = [this, &path](ConnectionPtr connection, int status, const string& /*reason*/) {
-        if (_subscribers[path].count(connection)) {
-          _subscribers[path].erase(connection);
+      pub_endpoint.on_close = [this, path](ConnectionPtr connection, int status, const string& /*reason*/) {
+        cout << "on_close" << endl;
+        auto& subscribers = _subscribers[path];
+        if (subscribers.count(connection)) {
+          cout << "remove subscriber from " << path << ": " << subscribers.size() << endl;
+          subscribers.erase(connection);
         }
       };
     }
@@ -65,7 +69,6 @@ namespace wspubctrl {
 
     WsServer _server;
     WsServer::Endpoint& _ctrl_endpoint;
-    std::map<std::string, WsServer::Endpoint*> _pub_endpoints;
     std::map<std::string, set<ConnectionPtr>> _subscribers;
     std::mutex _requests_mtx;
     std::condition_variable _requests_cv;
@@ -75,6 +78,7 @@ namespace wspubctrl {
 
   Server::Server(int port) :
     _detail(new Detail(port)) {
+    _detail->start_thread();
   }
 
   Server::~Server() { // Required for pimpl pattern
@@ -109,10 +113,13 @@ namespace wspubctrl {
 
   void Server::publish_data(const string& payload) {
     const string& path = default_pub_endpoint;
+    //cout << "publish to: " << path << endl;
     auto& subscribers = _detail->_subscribers[path];
+    //cout << "subscriber count: " << subscribers.size() << endl;
     auto send_stream = make_shared<SendStream>();
     *send_stream << payload;
-    for (auto& subscriber : _detail->_subscribers[path]) {
+    for (auto& subscriber : subscribers) {
+      //cout << "sending: " << payload << endl;
       subscriber->send(send_stream, [&](const SimpleWeb::error_code& ec) {}); // TODO: handle error
     }
   }

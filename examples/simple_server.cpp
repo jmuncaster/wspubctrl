@@ -13,6 +13,7 @@ int main(int argc, char** argv) {
   cout << "Start server" << endl;
   cout << "  * publish on " << wspubctrl::default_pub_uri << endl;;
   cout << "  * control on " << wspubctrl::default_ctrl_uri << endl;;
+  //server.start();
 
   string text = "Hello World!";
 
@@ -20,6 +21,7 @@ int main(int argc, char** argv) {
   while (true) {
     // Check for ctrl request to change the text
     server.wait_for_request(0, [&](const string& request) {
+      cout << "got request: " << request << endl;
       if (request.empty()) {
         return "Cannot set empty text";
       }
