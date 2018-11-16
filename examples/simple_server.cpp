@@ -10,10 +10,11 @@ using namespace std;
 // Main server process runs a program loop, publishes feed, and checks for control messages
 int main(int argc, char** argv) {
 
-  cout << "Start server" << endl;
-  cout << "  * control on *:5554/ctrl" << endl;
-  cout << "  * publish on *:5554/pub" << endl;
+  // Start server with /ctrl and /pub
   wspubctrl::Server server(5554, "/ctrl");
+  cout << "Start server on port 5554" << endl;
+  cout << "  * control on /ctrl" << endl;
+  cout << "  * publish on /pub" << endl;
   server.add_publish_endpoint("/pub");
   server.start();
 
