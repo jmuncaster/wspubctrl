@@ -17,12 +17,11 @@ typedef WsClient::SendStream SendStream;
 namespace wspubctrl {
 
   struct SubClient::Detail {
-    Detail(const string& pub_uri) :
-      _client(pub_uri),
+    Detail(const string& pub_uri)
+    :  _client(pub_uri),
       _mtx(),
       _new_message(false),
       _payload() {
-      cout << "pub_uri: " << pub_uri << endl;
       _client.on_message = [this](ConnectionPtr connection, MessagePtr message) {
         unique_lock<mutex> lock(_mtx);
         _payload = message->string();
@@ -68,7 +67,7 @@ namespace wspubctrl {
   }
 
   void SubClient::start() {
-    _detail->_client.start();
+    _detail->start_thread();
   }
 
   string SubClient::wait_for_data(int timeout_ms) {

@@ -51,7 +51,6 @@ int main(int argc, char* argv[]) {
     cerr << e.what() << endl;
   }
 
-  cout << "quit=true" << endl;
   quit = true;
   sub_thread.join();
   cout << endl;

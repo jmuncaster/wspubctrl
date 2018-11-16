@@ -21,15 +21,15 @@ typedef WsServer::SendStream SendStream;
 namespace wspubctrl {
 
   struct Server::Detail {
-    Detail(int port) :
-      _server(),
-      _ctrl_endpoint(_server.endpoint[default_ctrl_endpoint]) {
-
-      add_publish_endpoint(default_pub_endpoint);
-
+    Detail(int port) {
       _server.config.port = port;
+      setup_ctrl_endpoint(default_ctrl_endpoint);
+      add_publish_endpoint(default_pub_endpoint);
+    }
 
-      _ctrl_endpoint.on_message = [this](ConnectionPtr connection, MessagePtr message) {
+    void setup_ctrl_endpoint(const std::string& path) {
+      auto& ctrl_endpoint = _server.endpoint[path];
+      ctrl_endpoint.on_message = [this](ConnectionPtr connection, MessagePtr message) {
         unique_lock<mutex> lock(_requests_mtx);
         _requests.push({connection, message});
         lock.unlock();
@@ -38,20 +38,29 @@ namespace wspubctrl {
     }
 
     void add_publish_endpoint(const std::string& path) {
-      cout << "publish: " << path << endl;
       auto& pub_endpoint = _server.endpoint[path];
+      _subscribers[path] = {};
+
       pub_endpoint.on_open = [this, path](ConnectionPtr connection) {
         auto& subscribers = _subscribers[path];
         subscribers.insert(connection);
-        cout << "add subscriber to " << path << ": " << subscribers.size() << endl;
+        //cout << "added subscriber to " << path << ": " << subscribers.size() << endl;
       };
 
       pub_endpoint.on_close = [this, path](ConnectionPtr connection, int status, const string& /*reason*/) {
-        cout << "on_close" << endl;
         auto& subscribers = _subscribers[path];
         if (subscribers.count(connection)) {
-          cout << "remove subscriber from " << path << ": " << subscribers.size() << endl;
           subscribers.erase(connection);
+          //cout << "removed subscriber from " << path << ": " << subscribers.size() << endl;
+        }
+      };
+
+      // See http://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html, Error Codes for error code meanings
+      pub_endpoint.on_error = [this, path](ConnectionPtr connection, const SimpleWeb::error_code &ec) {
+        auto& subscribers = _subscribers[path];
+        if (subscribers.count(connection)) {
+          subscribers.erase(connection);
+          //cout << "removed subscriber from " << path << ": " << subscribers.size() << endl;
         }
       };
     }
@@ -68,7 +77,6 @@ namespace wspubctrl {
     }
 
     WsServer _server;
-    WsServer::Endpoint& _ctrl_endpoint;
     std::map<std::string, set<ConnectionPtr>> _subscribers;
     std::mutex _requests_mtx;
     std::condition_variable _requests_cv;
@@ -113,13 +121,10 @@ namespace wspubctrl {
 
   void Server::publish_data(const string& payload) {
     const string& path = default_pub_endpoint;
-    //cout << "publish to: " << path << endl;
     auto& subscribers = _detail->_subscribers[path];
-    //cout << "subscriber count: " << subscribers.size() << endl;
     auto send_stream = make_shared<SendStream>();
     *send_stream << payload;
     for (auto& subscriber : subscribers) {
-      //cout << "sending: " << payload << endl;
       subscriber->send(send_stream, [&](const SimpleWeb::error_code& ec) {}); // TODO: handle error
     }
   }
