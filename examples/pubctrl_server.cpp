@@ -26,14 +26,14 @@ int main(int argc, char** argv) {
   while (true) {
 
     // Check for ctrl request to change the text or to kill all subscribers
-    server.wait_for_request(0, [&](const string& request) {
+    server.handle_request(0, [&](const string& request) {
       cout << "got request: " << request << endl;
       if (request.empty()) {
         return "Cannot set empty text";
       }
       else {
         if (request == "quit") {
-          server.publish_data("/pub", "quit");
+          server.send("/pub", "quit");
           return "OK";
         }
         else {
@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
     transform(text.begin(), text.begin() + j, mangled_text.begin(), fn1);
     transform(text.begin() + j, text.end(), mangled_text.begin() + j, fn2);
 
-    server.publish_data("/pub", mangled_text);
+    server.send("/pub", mangled_text);
   }
 }
 

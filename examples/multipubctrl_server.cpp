@@ -32,13 +32,13 @@ int main(int argc, char** argv) {
   int iter = 0;
   while (true) {
     // Check for ctrl request to change the text of a particular endpoint, or quit.
-    server.wait_for_request(0, [&](const string& request) {
+    server.handle_request(0, [&](const string& request) {
       cout << "got request: " << request << endl;
 
       // quit?
       if (request == "quit") {
         for (auto& p : endpoint_texts) {
-          server.publish_data(p.first, "quit");
+          server.send(p.first, "quit");
         }
         return "OK";
       }
@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
         return "unknown endpoint";
       }
       else if (text == "quit") {
-        server.publish_data(endpoint, "quit");
+        server.send(endpoint, "quit");
         return "OK";
       }
       else {
@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
       transform(text.begin() + j, text.end(), mangled_text.begin() + j, fn2);
 
       // Publish
-      server.publish_data(endpoint, mangled_text);
+      server.send(endpoint, mangled_text);
     }
   }
 }

@@ -27,8 +27,7 @@ namespace wspubctrl {
     }
 
     void setup_ctrl_endpoint(const std::string& path) {
-      _ctrl_endpoint_path = path;
-      auto& ctrl_endpoint = _server.endpoint[_ctrl_endpoint_path];
+      auto& ctrl_endpoint = _server.endpoint[path];
       ctrl_endpoint.on_message = [this](ConnectionPtr connection, MessagePtr message) {
         unique_lock<mutex> lock(_requests_mtx);
         _requests.push({connection, message});
@@ -77,7 +76,6 @@ namespace wspubctrl {
     }
 
     WsServer _server;
-    std::string _ctrl_endpoint_path;
     std::map<std::string, set<ConnectionPtr>> _subscribers;
     std::mutex _requests_mtx;
     std::condition_variable _requests_cv;
@@ -101,7 +99,7 @@ namespace wspubctrl {
     _detail->add_publish_endpoint(path);
   }
 
-  bool Server::wait_for_request(int timeout_ms, function<string(const string&)> request_handler) {
+  bool Server::handle_request(int timeout_ms, function<string(const string&)> request_handler) {
 
     unique_lock<mutex> lock(_detail->_requests_mtx);
     if (_detail->_requests_cv.wait_for(lock, milliseconds(timeout_ms), [&]() { return !_detail->_requests.empty(); })) {
@@ -123,11 +121,7 @@ namespace wspubctrl {
     return false;
   }
 
-  void Server::publish_data(const string& payload) {
-    publish_data(default_pub_endpoint, payload);
-  }
-
-  void Server::publish_data(const string& endpoint_path, const string& payload) {
+  void Server::send(const string& endpoint_path, const string& payload) {
     auto& subscribers = _detail->_subscribers[endpoint_path];
     auto send_stream = make_shared<SendStream>();
     *send_stream << payload;
