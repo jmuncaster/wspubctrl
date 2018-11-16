@@ -10,8 +10,11 @@ namespace wspubctrl {
   // Server publishes data stream and accepts synchronous control requests.
   class Server {
     public:
-      Server(int port = default_port);
+      Server(int port = default_port, const std::string& ctrl_endpoint = default_ctrl_endpoint);
       ~Server();
+
+      int port() const;
+      const std::string& ctrl_endpoint() const;
 
       void start();
 

@@ -21,13 +21,14 @@ typedef WsServer::SendStream SendStream;
 namespace wspubctrl {
 
   struct Server::Detail {
-    Detail(int port) {
+    Detail(int port, const string& ctrl_endpoint_path) {
       _server.config.port = port;
-      setup_ctrl_endpoint(default_ctrl_endpoint);
+      setup_ctrl_endpoint(ctrl_endpoint_path);
     }
 
     void setup_ctrl_endpoint(const std::string& path) {
-      auto& ctrl_endpoint = _server.endpoint[path];
+      _ctrl_endpoint_path = path;
+      auto& ctrl_endpoint = _server.endpoint[_ctrl_endpoint_path];
       ctrl_endpoint.on_message = [this](ConnectionPtr connection, MessagePtr message) {
         unique_lock<mutex> lock(_requests_mtx);
         _requests.push({connection, message});
@@ -76,6 +77,7 @@ namespace wspubctrl {
     }
 
     WsServer _server;
+    std::string _ctrl_endpoint_path;
     std::map<std::string, set<ConnectionPtr>> _subscribers;
     std::mutex _requests_mtx;
     std::condition_variable _requests_cv;
@@ -83,8 +85,8 @@ namespace wspubctrl {
     thread _thread;
   };
 
-  Server::Server(int port) :
-    _detail(new Detail(port)) {
+  Server::Server(int port, const string& ctrl_endpoint_path) :
+    _detail(new Detail(port, ctrl_endpoint_path)) {
   }
 
   Server::~Server() { // Required for pimpl pattern
