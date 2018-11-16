@@ -7,9 +7,15 @@ const int timeout_ms = 5000;
 
 int main(int argc, char* argv[]) {
 
-  cout << "Start client. Type text to send to server. 'quit' to exit." << endl;
-  cout << " * control   : localhost:5554/ctrl" << endl;
-  wspubctrl::CtrlClient ctrl_client("localhost:5554/ctrl");
+  if (argc <= 1) {
+    cout << "example: ctrl_client localhost:5554/ctrl" << endl;
+    return 1;
+  }
+  string ctrl_uri = argv[1];
+
+  cout << "Start control client. Type text to send to server. 'quit' to exit." << endl;
+  cout << " * control: " << ctrl_uri << endl;
+  wspubctrl::CtrlClient ctrl_client(ctrl_uri);
 
   try {
     string input;
