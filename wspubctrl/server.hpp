@@ -23,6 +23,7 @@ namespace wspubctrl {
 
       // Publish a message to the pub socket
       void publish_data(const std::string& payload);
+      void publish_data(const std::string& endpoint_path, const std::string& payload);
 
     private:
       struct Detail;

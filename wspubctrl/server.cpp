@@ -120,8 +120,11 @@ namespace wspubctrl {
   }
 
   void Server::publish_data(const string& payload) {
-    const string& path = default_pub_endpoint;
-    auto& subscribers = _detail->_subscribers[path];
+    publish_data(default_pub_endpoint, payload);
+  }
+
+  void Server::publish_data(const string& endpoint_path, const string& payload) {
+    auto& subscribers = _detail->_subscribers[endpoint_path];
     auto send_stream = make_shared<SendStream>();
     *send_stream << payload;
     for (auto& subscriber : subscribers) {
