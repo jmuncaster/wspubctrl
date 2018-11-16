@@ -22,6 +22,7 @@ namespace wspubctrl {
       bool wait_for_request(int timeout_ms = forever, request_callback_t request_handler = nullptr);
 
       // Publish a message to the pub socket
+      void add_publish_endpoint(const std::string& path);
       void publish_data(const std::string& payload);
       void publish_data(const std::string& endpoint_path, const std::string& payload);
 

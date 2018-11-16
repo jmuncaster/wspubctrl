@@ -97,6 +97,10 @@ namespace wspubctrl {
     _detail->start_thread();
   }
 
+  void Server::add_publish_endpoint(const std::string& path) {
+    _detail->add_publish_endpoint(path);
+  }
+
   bool Server::wait_for_request(int timeout_ms, function<string(const string&)> request_handler) {
 
     unique_lock<mutex> lock(_detail->_requests_mtx);
