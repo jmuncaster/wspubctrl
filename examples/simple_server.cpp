@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
   cout << "Start server" << endl;
   cout << "  * publish on " << wspubctrl::default_pub_uri << endl;;
   cout << "  * control on " << wspubctrl::default_ctrl_uri << endl;;
-  //server.start();
+  server.start();
 
   string text = "Hello World!";
 

@@ -23,8 +23,8 @@ namespace wspubctrl {
   struct Server::Detail {
     Detail(int port) {
       _server.config.port = port;
-      setup_ctrl_endpoint(default_ctrl_endpoint);
       add_publish_endpoint(default_pub_endpoint);
+      setup_ctrl_endpoint(default_ctrl_endpoint);
     }
 
     void setup_ctrl_endpoint(const std::string& path) {
@@ -86,7 +86,6 @@ namespace wspubctrl {
 
   Server::Server(int port) :
     _detail(new Detail(port)) {
-    _detail->start_thread();
   }
 
   Server::~Server() { // Required for pimpl pattern
