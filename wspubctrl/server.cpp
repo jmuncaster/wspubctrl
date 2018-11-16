@@ -23,7 +23,6 @@ namespace wspubctrl {
   struct Server::Detail {
     Detail(int port) {
       _server.config.port = port;
-      add_publish_endpoint(default_pub_endpoint);
       setup_ctrl_endpoint(default_ctrl_endpoint);
     }
 
