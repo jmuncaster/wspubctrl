@@ -31,8 +31,14 @@ int main(int argc, char** argv) {
         return "Cannot set empty text";
       }
       else {
-        text = request;
-        return "OK";
+        if (request == "quit") {
+          server.publish_data("/pub", "quit");
+          return "OK";
+        }
+        else {
+          text = request;
+          return "OK";
+        }
       }
     });
 
