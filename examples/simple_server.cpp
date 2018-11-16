@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
   int iter = 0;
   while (true) {
 
-    // Check for ctrl request to change the text
+    // Check for ctrl request to change the text or to kill all subscribers
     server.wait_for_request(0, [&](const string& request) {
       cout << "got request: " << request << endl;
       if (request.empty()) {

@@ -1,9 +1,8 @@
 #include <wspubctrl/server.hpp>
-#include <cstdlib>
-#include <iostream>
-#include <thread>
 #include <algorithm>
+#include <iostream>
 #include <map>
+#include <thread>
 
 using namespace std;
 
@@ -11,44 +10,65 @@ using namespace std;
 int main(int argc, char** argv) {
 
   if (argc <= 1) {
-    cout << "usage: simple_server <pub_path1> [pub_path2]..." << endl;
+    cout << "usage: multi_server <pub_path1> [pub_path2]..." << endl;
+    cout << "example: multi_server /pub1 /pub2 /pub3" << endl;
     return 1;
   }
 
-  map<string, string> publish_texts;
-
-  wspubctrl::Server server;
-  cout << "Start server" << endl;
-  cout << "  * control on " << wspubctrl::default_ctrl_uri << endl;;
+  // Create server and add all publish endpoints
+  wspubctrl::Server server(5554, "/ctrl");
+  cout << "Start server on port 5554" << endl;
+  cout << "  * control on /ctrl" << endl;
+  map<string, string> endpoint_texts;
   for (int i = 1; i < argc; ++i) {
-    string path = argv[i];
-    cout << "  * publish on " << wspubctrl::default_host << ":" << wspubctrl::default_port << path << endl;
-    server.add_publish_endpoint(path);
-    publish_texts[path] = "Hello, World!";
+    string endpoint = argv[i];
+    cout << "  * publish on " << endpoint << endl;
+    server.add_publish_endpoint(endpoint);
+    endpoint_texts[endpoint] = "Hello, World"; // to be sent to this endpoint
   }
-  server.start();
 
+  // Main program loop
+  server.start();
   int iter = 0;
   while (true) {
-    // Check for ctrl request to change the text
+    // Check for ctrl request to change the text of a particular endpoint, or quit.
     server.wait_for_request(0, [&](const string& request) {
       cout << "got request: " << request << endl;
-      if (request.empty()) {
-        return "Cannot set empty text";
+
+      // quit?
+      if (request == "quit") {
+        for (auto& p : endpoint_texts) {
+          server.publish_data(p.first, "quit");
+        }
+        return "OK";
+      }
+
+      // format: <endpoint> [<text>|quit]
+      auto it = request.find(" ");
+      if (it == string::npos) {
+        return "command format: quit|<endpoint> quit|<endpoint> <text>";
+      }
+      auto endpoint = request.substr(0, it);
+      auto text = request.substr(it + 1, string::npos);
+
+      if (!endpoint_texts.count(endpoint)) {
+        return "unknown endpoint";
+      }
+      else if (text == "quit") {
+        server.publish_data(endpoint, "quit");
+        return "OK";
       }
       else {
-        for (int i = 1; i < argc; ++i) {
-          publish_texts[argv[i]] = request;
-        }
+        endpoint_texts[endpoint] = text;
         return "OK";
       }
     });
 
-    // Do some 'work' mangling the texts and publish
+    // Do some 'work' mangling the texts
     this_thread::sleep_for(chrono::milliseconds(10));
-    for (int i = 1; i < argc; ++i) {
-      string path = argv[i];
-      auto& text = publish_texts[path];
+    for (auto& p : endpoint_texts) {
+      auto& endpoint = p.first;
+      auto& text = p.second;
       string mangled_text = text;
       int j = ++iter % text.size();
       auto fn1 = (iter / text.size() % 2 == 0) ? ::toupper : ::tolower;
@@ -56,7 +76,8 @@ int main(int argc, char** argv) {
       transform(text.begin(), text.begin() + j, mangled_text.begin(), fn1);
       transform(text.begin() + j, text.end(), mangled_text.begin() + j, fn2);
 
-      server.publish_data(path, mangled_text);
+      // Publish
+      server.publish_data(endpoint, mangled_text);
     }
   }
 }
