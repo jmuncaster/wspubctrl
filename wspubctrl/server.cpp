@@ -21,27 +21,45 @@ typedef WsServer::SendStream SendStream;
 namespace wspubctrl {
 
   struct Server::Detail {
-    Detail(int port) :
-      _server(),
-      _pub_endpoint(_server.endpoint[default_pub_endpoint]),
-      _ctrl_endpoint(_server.endpoint[default_ctrl_endpoint]) {
-
+    Detail(int port, const string& ctrl_endpoint_path) {
       _server.config.port = port;
+      setup_ctrl_endpoint(ctrl_endpoint_path);
+    }
 
-      _ctrl_endpoint.on_message = [this](ConnectionPtr connection, MessagePtr message) {
+    void setup_ctrl_endpoint(const std::string& path) {
+      auto& ctrl_endpoint = _server.endpoint[path];
+      ctrl_endpoint.on_message = [this](ConnectionPtr connection, MessagePtr message) {
         unique_lock<mutex> lock(_requests_mtx);
         _requests.push({connection, message});
         lock.unlock();
         _requests_cv.notify_one();
       };
+    }
 
-      _pub_endpoint.on_open = [this](ConnectionPtr connection) {
-        _subscribers.insert(connection);
+    void add_publish_endpoint(const std::string& path) {
+      auto& pub_endpoint = _server.endpoint[path];
+      _subscribers[path] = {};
+
+      pub_endpoint.on_open = [this, path](ConnectionPtr connection) {
+        auto& subscribers = _subscribers[path];
+        subscribers.insert(connection);
+        //cout << "added subscriber to " << path << ": " << subscribers.size() << endl;
       };
 
-      _pub_endpoint.on_close = [this](ConnectionPtr connection, int status, const string& /*reason*/) {
-        if (_subscribers.count(connection)) {
-          _subscribers.erase(connection);
+      pub_endpoint.on_close = [this, path](ConnectionPtr connection, int status, const string& /*reason*/) {
+        auto& subscribers = _subscribers[path];
+        if (subscribers.count(connection)) {
+          subscribers.erase(connection);
+          //cout << "removed subscriber from " << path << ": " << subscribers.size() << endl;
+        }
+      };
+
+      // See http://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html, Error Codes for error code meanings
+      pub_endpoint.on_error = [this, path](ConnectionPtr connection, const SimpleWeb::error_code &ec) {
+        auto& subscribers = _subscribers[path];
+        if (subscribers.count(connection)) {
+          subscribers.erase(connection);
+          //cout << "removed subscriber from " << path << ": " << subscribers.size() << endl;
         }
       };
     }
@@ -58,25 +76,30 @@ namespace wspubctrl {
     }
 
     WsServer _server;
-    WsServer::Endpoint& _pub_endpoint;
-    WsServer::Endpoint& _ctrl_endpoint;
+    std::map<std::string, set<ConnectionPtr>> _subscribers;
     std::mutex _requests_mtx;
     std::condition_variable _requests_cv;
     queue<pair<ConnectionPtr, MessagePtr>> _requests;
-    set<ConnectionPtr> _subscribers;
     thread _thread;
   };
 
-  Server::Server(int port) :
-    _detail(new Detail(port)) {
-    _detail->start_thread();
+  Server::Server(int port, const string& ctrl_endpoint_path) :
+    _detail(new Detail(port, ctrl_endpoint_path)) {
   }
 
   Server::~Server() { // Required for pimpl pattern
     _detail->stop_thread();
   }
 
-  bool Server::wait_for_request(int timeout_ms, function<string(const string&)> request_handler) {
+  void Server::start() {
+    _detail->start_thread();
+  }
+
+  void Server::add_publish_endpoint(const std::string& path) {
+    _detail->add_publish_endpoint(path);
+  }
+
+  bool Server::handle_request(int timeout_ms, function<string(const string&)> request_handler) {
 
     unique_lock<mutex> lock(_detail->_requests_mtx);
     if (_detail->_requests_cv.wait_for(lock, milliseconds(timeout_ms), [&]() { return !_detail->_requests.empty(); })) {
@@ -98,10 +121,11 @@ namespace wspubctrl {
     return false;
   }
 
-  void Server::publish_data(const string& payload) {
+  void Server::send(const string& endpoint_path, const string& payload) {
+    auto& subscribers = _detail->_subscribers[endpoint_path];
     auto send_stream = make_shared<SendStream>();
     *send_stream << payload;
-    for (auto& subscriber : _detail->_subscribers) {
+    for (auto& subscriber : subscribers) {
       subscriber->send(send_stream, [&](const SimpleWeb::error_code& ec) {}); // TODO: handle error
     }
   }
