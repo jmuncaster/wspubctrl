@@ -9,7 +9,7 @@ namespace wspubctrl {
   // Client subscribes to a data stream
   class SubClient {
     public:
-      SubClient(const std::string& pub_uri = default_pub_uri);
+      SubClient(const std::string& pub_uri);
       ~SubClient();
 
       void start();

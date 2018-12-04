@@ -10,7 +10,7 @@ namespace wspubctrl {
   // Client issues synchronous control requests.
   class CtrlClient {
     public:
-      CtrlClient(const std::string& ctrl_uri = default_ctrl_uri);
+      CtrlClient(const std::string& ctrl_uri);
       ~CtrlClient();
 
       // Synchronously issue a request and wait for the reply.
