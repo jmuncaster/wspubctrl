@@ -17,10 +17,12 @@ int main(int argc, char* argv[]) {
   try {
     cout << "Start sub client. Use ctrl client to issue 'quit' command to shut down subscribers." << endl;
     cout << " * subscribe: " << pub_uri << endl;
-
-    // Continuously report the stream on the same line
     wspubctrl::SubClient sub_client(pub_uri);
-    sub_client.start();
+
+    cout << "Connecting to " << pub_uri << "..." << flush;
+    sub_client.connect();
+    cout << " connected." << endl;
+
     for (;;) {
       string data = sub_client.wait_for_data(timeout_ms);
       if (data == "quit") {

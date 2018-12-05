@@ -12,7 +12,8 @@ namespace wspubctrl {
       SubClient(const std::string& pub_uri);
       ~SubClient();
 
-      void start();
+      void connect();
+      void disconnect();
 
       // Polls subscription for data
       // @param timeout_ms: Wait for this long for data. -1 means wait forever.

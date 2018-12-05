@@ -64,9 +64,9 @@ namespace wspubctrl {
     void start_thread() {
       _thread = thread([this]() {
         _state = State::temporarily_disconnected;
-        while (!shutdown) {
+        while (!_shutdown) {
           _client.start();
-          if (!shutdown) {
+          if (!_shutdown) {
             this_thread::sleep_for(chrono::milliseconds(1000));
           }
         }
@@ -75,7 +75,7 @@ namespace wspubctrl {
 
     void stop_thread() {
       unique_lock<mutex> lock(_mtx);
-      shutdown = true;
+      _shutdown = true;
 
       auto timeout_ms = default_request_timeout_ms;
       if (_connection && _state == State::connected) {
@@ -97,7 +97,7 @@ namespace wspubctrl {
     condition_variable _cnd;
     thread _thread;
     State _state = State::disconnected;
-    bool shutdown = false;
+    bool _shutdown = false;
   };
 
   CtrlClient::CtrlClient(const string& ctrl_uri) :
