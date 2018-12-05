@@ -28,6 +28,11 @@ namespace wspubctrl {
 
     void setup_ctrl_endpoint(const std::string& path) {
       auto& ctrl_endpoint = _server.endpoint[path];
+
+      //ctrl_endpoint.on_open = [this](ConnectionPtr connection) {
+      //  cout << "new connection to ctrl endpoint" << endl;
+      //};
+
       ctrl_endpoint.on_message = [this](ConnectionPtr connection, MessagePtr message) {
         unique_lock<mutex> lock(_requests_mtx);
         _requests.push({connection, message});

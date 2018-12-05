@@ -17,6 +17,10 @@ int main(int argc, char* argv[]) {
   cout << " * control: " << ctrl_uri << endl;
   wspubctrl::CtrlClient ctrl_client(ctrl_uri);
 
+  cout << "Connecting to " << ctrl_uri << "..." << flush;
+  ctrl_client.connect();
+  cout << " connected." << endl;
+
   try {
     string input;
     while (input != "quit") {
@@ -31,6 +35,10 @@ int main(int argc, char* argv[]) {
     // probably a timeout
     cerr << e.what() << endl;
   }
+
+  cout << "Disconnecting from " << ctrl_uri << "..." << flush;
+  ctrl_client.disconnect();
+  cout << " disconnected." << endl;
 
   return 0;
 }
