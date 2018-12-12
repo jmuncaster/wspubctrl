@@ -13,6 +13,14 @@ namespace wspubctrl {
       CtrlClient(const std::string& ctrl_uri);
       ~CtrlClient();
 
+      // Start client thread and connects to server.
+      // @returns if connection succeeded
+      // @throws on socket error or timeout
+      void connect();
+
+      // Stop client thread.
+      void disconnect();
+
       // Synchronously issue a request and wait for the reply.
       // @returns contents of reply
       // @throws on socket error or timeout

@@ -17,7 +17,7 @@ typedef WsClient::SendStream SendStream;
 namespace wspubctrl {
 
   namespace {
-    enum class State { disconnected, connected, error};
+    enum class State { disconnected, connected, temporarily_disconnected, error};
   }
 
   struct CtrlClient::Detail {
@@ -55,7 +55,7 @@ namespace wspubctrl {
       _client.on_close = [this](ConnectionPtr connection, int status, const string& reason) {
         unique_lock<mutex> lock(_mtx);
         _connection = {};
-        _state = State::disconnected;
+        _state = State::temporarily_disconnected;
         lock.unlock();
         _cnd.notify_one();
       };
@@ -63,20 +63,29 @@ namespace wspubctrl {
 
     void start_thread() {
       _thread = thread([this]() {
-        for (;;) {
+        _state = State::temporarily_disconnected;
+        while (!_shutdown) {
           _client.start();
-          if (!_reconnect) {
-            break;
+          if (!_shutdown) {
+            this_thread::sleep_for(chrono::milliseconds(1000));
           }
-          this_thread::sleep_for(chrono::milliseconds(1000));
         }
       });
     }
 
     void stop_thread() {
-      _reconnect = false;
+      unique_lock<mutex> lock(_mtx);
+      _shutdown = true;
+
+      auto timeout_ms = default_request_timeout_ms;
+      if (_connection && _state == State::connected) {
+        _connection->send_close(0);
+        _cnd.wait_for(lock, chrono::milliseconds(timeout_ms), [&]() { return _state != State::connected;});
+      }
+
       _client.stop();
       _thread.join();
+      _state = State::disconnected;
     }
 
     WsClient _client;
@@ -88,15 +97,29 @@ namespace wspubctrl {
     condition_variable _cnd;
     thread _thread;
     State _state = State::disconnected;
-    bool _reconnect = true;
+    bool _shutdown = false;
   };
 
   CtrlClient::CtrlClient(const string& ctrl_uri) :
     _detail(new Detail(ctrl_uri)) {
-    _detail->start_thread();
   }
 
   CtrlClient::~CtrlClient() { // Required for pimpl pattern
+    if (_detail->_state != State::disconnected) {
+      disconnect();
+    }
+  }
+
+  void CtrlClient::connect() {
+    unique_lock<mutex> lock(_detail->_mtx);
+    _detail->start_thread();
+    auto timeout_ms = default_request_timeout_ms;
+    if (!_detail->_cnd.wait_for(lock, chrono::milliseconds(timeout_ms), [&]() { return _detail->_state == State::connected;})) {
+      throw runtime_error("timeout: could not establish first connection");
+    }
+  }
+
+  void CtrlClient::disconnect() {
     _detail->stop_thread();
   }
 
