@@ -6,13 +6,23 @@
 
 namespace wspubctrl {
 
+  namespace detail {
+    class ClientDetail;
+  }
+
   // Client subscribes to a data stream
   class SubClient {
     public:
       SubClient(const std::string& pub_uri);
       ~SubClient();
 
+      // Start client thread and connects to server.
+      // @returns if connection succeeded
+      // @throws on socket error or timeout
       void connect();
+
+      // Attempts to close socket connection and waits short time. Stops client thread and returns regardless.
+      // Does not throw.
       void disconnect();
 
       // Polls subscription for data
@@ -22,9 +32,7 @@ namespace wspubctrl {
       std::string wait_for_data(int timeout_ms = forever);
 
     private:
-      struct Detail;
-      std::unique_ptr<Detail> _detail;
+      std::unique_ptr<detail::ClientDetail> _detail;
   };
-
-}
+} // wspubctrl
 

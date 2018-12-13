@@ -20,7 +20,10 @@ add_library(wspubctrl
   wspubctrl/server.cpp
   wspubctrl/server.hpp
   wspubctrl/sub_client.cpp
-  wspubctrl/sub_client.hpp)
+  wspubctrl/sub_client.hpp
+  wspubctrl/detail/client_detail.cpp
+  wspubctrl/detail/client_detail.hpp
+  )
 target_include_directories(wspubctrl INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(wspubctrl PUBLIC simple-websocket-server)
 
