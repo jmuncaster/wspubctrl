@@ -23,8 +23,12 @@ namespace wspubctrl {
     _detail->disconnect();
   }
 
-  string SubClient::wait_for_data(int timeout_ms) {
-    return _detail->wait_for_data(timeout_ms);
+  string SubClient::poll(int timeout_ms) {
+    return _detail->poll(timeout_ms);
+  }
+
+  bool SubClient::poll(std::string& data, int timeout_ms) {
+    return _detail->poll(data, timeout_ms);
   }
 }
 

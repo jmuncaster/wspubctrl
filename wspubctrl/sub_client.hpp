@@ -29,7 +29,15 @@ namespace wspubctrl {
       // @param timeout_ms: Wait for this long for data. -1 means wait forever.
       // @returns received data
       // @throws on socket error or timeout
-      std::string wait_for_data(int timeout_ms = forever);
+      std::string poll(int timeout_ms = forever);
+
+      // Polls subscription for data
+      // @param timeout_ms: Wait for this long for data. -1 means wait forever.
+      // @returns true if data received, data is filled in
+      // @returns false on on timeout, data is unmodified
+      // @throws on socket error
+      bool poll(std::string& data, int timeout_ms = forever);
+
 
     private:
       std::unique_ptr<detail::ClientDetail> _detail;
