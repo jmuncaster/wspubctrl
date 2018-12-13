@@ -24,7 +24,12 @@ int main(int argc, char* argv[]) {
     cout << " connected." << endl;
 
     for (;;) {
-      string data = sub_client.wait_for_data(timeout_ms);
+      string data;
+      if (!sub_client.poll(data, timeout_ms)) {
+        cout << "timeout" << endl;
+        continue;
+      }
+
       if (data == "quit") {
         break;
       }

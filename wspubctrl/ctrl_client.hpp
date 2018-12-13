@@ -1,11 +1,14 @@
 #pragma once
 
 #include "constants.hpp"
-#include <functional>
 #include <memory>
 #include <string>
 
 namespace wspubctrl {
+
+  namespace detail {
+    class ClientImpl;
+  }
 
   // Client issues synchronous control requests.
   class CtrlClient {
@@ -18,7 +21,8 @@ namespace wspubctrl {
       // @throws on socket error or timeout
       void connect();
 
-      // Stop client thread.
+      // Attempts to close socket connection and waits short time. Stops client thread and returns regardless.
+      // Does not throw.
       void disconnect();
 
       // Synchronously issue a request and wait for the reply.
@@ -27,9 +31,7 @@ namespace wspubctrl {
       std::string request(const std::string& payload, int timeout_ms = default_request_timeout_ms);
 
     private:
-      struct Detail;
-      std::unique_ptr<Detail> _detail;
+      std::unique_ptr<detail::ClientImpl> _impl;
   };
-
-}
+} // wspubctrl
 
