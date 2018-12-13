@@ -16,10 +16,10 @@ namespace wspubctrl {
     typedef WsClient::SendStream SendStream;
 
 
-    class ClientDetail{
+    class ClientImpl{
       public:
-        ClientDetail(const std::string& uri);
-        ~ClientDetail();
+        ClientImpl(const std::string& uri);
+        ~ClientImpl();
 
         void connect();
         void disconnect();

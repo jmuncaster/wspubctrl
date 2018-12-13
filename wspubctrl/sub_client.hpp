@@ -7,7 +7,7 @@
 namespace wspubctrl {
 
   namespace detail {
-    class ClientDetail;
+    class ClientImpl;
   }
 
   // Client subscribes to a data stream
@@ -40,7 +40,7 @@ namespace wspubctrl {
 
 
     private:
-      std::unique_ptr<detail::ClientDetail> _detail;
+      std::unique_ptr<detail::ClientImpl> _impl;
   };
 } // wspubctrl
 

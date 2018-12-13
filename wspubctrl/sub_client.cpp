@@ -1,34 +1,31 @@
 #include "sub_client.hpp"
-#include "detail/client_detail.hpp"
-#include "constants.hpp"
-#include <mutex>
-#include <stdexcept>
+#include "detail/client_impl.hpp"
 
 using namespace std;
 
 namespace wspubctrl {
 
   SubClient::SubClient(const string& pub_uri) :
-    _detail(new detail::ClientDetail(pub_uri)) {
+    _impl(new detail::ClientImpl(pub_uri)) {
   }
 
   SubClient::~SubClient() { // Required for pimpl pattern
   }
 
   void SubClient::connect() {
-    _detail->connect();
+    _impl->connect();
   }
 
   void SubClient::disconnect() {
-    _detail->disconnect();
+    _impl->disconnect();
   }
 
   string SubClient::poll(int timeout_ms) {
-    return _detail->poll(timeout_ms);
+    return _impl->poll(timeout_ms);
   }
 
   bool SubClient::poll(std::string& data, int timeout_ms) {
-    return _detail->poll(data, timeout_ms);
+    return _impl->poll(data, timeout_ms);
   }
 }
 

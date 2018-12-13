@@ -1,4 +1,4 @@
-#include "client_detail.hpp"
+#include "client_impl.hpp"
 #include "../constants.hpp"
 #include <condition_variable>
 #include <mutex>
@@ -15,7 +15,7 @@ namespace wspubctrl {
     constexpr int connect_timeout_ms = 1000;
     constexpr int stop_thread_close_timeout_ms = 1000;
 
-    ClientDetail::ClientDetail(const string& uri) :
+    ClientImpl::ClientImpl(const string& uri) :
       _client(uri),
       _mtx(),
       _new_message(false),
@@ -55,13 +55,13 @@ namespace wspubctrl {
       };
     }
 
-    ClientDetail::~ClientDetail() {
+    ClientImpl::~ClientImpl() {
       if (_state != State::disconnected) {
         stop_thread();
       }
     }
 
-    void ClientDetail::connect() {
+    void ClientImpl::connect() {
       unique_lock<mutex> lock(_mtx);
       start_thread();
       auto timeout_ms = connect_timeout_ms;
@@ -70,11 +70,11 @@ namespace wspubctrl {
       }
     }
 
-    void ClientDetail::disconnect() {
+    void ClientImpl::disconnect() {
       stop_thread();
     }
 
-    void ClientDetail::start_thread() {
+    void ClientImpl::start_thread() {
       _thread = thread([this]() {
         _state = State::temporarily_disconnected;
         while (!_shutdown) {
@@ -86,7 +86,7 @@ namespace wspubctrl {
       });
     }
 
-    void ClientDetail::stop_thread() {
+    void ClientImpl::stop_thread() {
       unique_lock<mutex> lock(_mtx);
       _shutdown = true;
 
@@ -101,7 +101,7 @@ namespace wspubctrl {
       _state = State::disconnected;
     }
 
-    string ClientDetail::request_and_wait_for_reply(const std::string& payload, int timeout_ms) {
+    string ClientImpl::request_and_wait_for_reply(const std::string& payload, int timeout_ms) {
       unique_lock<mutex> lock(_mtx);
       if (!_cnd.wait_for(lock, chrono::milliseconds(timeout_ms), [&]() { return _state == State::connected;})) {
         throw runtime_error("timeout: could not establish connection for request");
@@ -127,7 +127,7 @@ namespace wspubctrl {
       }
     }
 
-    string ClientDetail::poll(int timeout_ms) {
+    string ClientImpl::poll(int timeout_ms) {
       string data;
       if (poll(data, timeout_ms)) {
         return data;
@@ -137,7 +137,7 @@ namespace wspubctrl {
       }
     }
 
-    bool ClientDetail::poll(std::string& data, int timeout_ms) {
+    bool ClientImpl::poll(std::string& data, int timeout_ms) {
       unique_lock<mutex> lock(_mtx);
       if (timeout_ms == forever) {
         _cnd.wait(lock, [this]() { return _new_message; });

@@ -7,7 +7,7 @@
 namespace wspubctrl {
 
   namespace detail {
-    class ClientDetail;
+    class ClientImpl;
   }
 
   // Client issues synchronous control requests.
@@ -31,7 +31,7 @@ namespace wspubctrl {
       std::string request(const std::string& payload, int timeout_ms = default_request_timeout_ms);
 
     private:
-      std::unique_ptr<detail::ClientDetail> _detail;
+      std::unique_ptr<detail::ClientImpl> _impl;
   };
 } // wspubctrl
 
