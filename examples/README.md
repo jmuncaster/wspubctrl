@@ -41,5 +41,5 @@ Run a control client:
 ```
 $ ./ctrl_client localhost:5554/ctrl
 ```
-Type in text in the form of "<endpoint> <text>" to change the text published to a particular endpoint.
+Type in text in the form of "`endpoint` text" to change the text published to a particular endpoint.
 
