@@ -21,7 +21,8 @@ typedef WsServer::SendStream SendStream;
 namespace wspubctrl {
 
   struct Server::Detail {
-    Detail(int port, const string& ctrl_endpoint_path) {
+    Detail(const string& address, int port, const string& ctrl_endpoint_path) {
+      _server.config.address = address;
       _server.config.port = port;
       setup_ctrl_endpoint(ctrl_endpoint_path);
     }
@@ -88,8 +89,12 @@ namespace wspubctrl {
     thread _thread;
   };
 
+  Server::Server(const string& address, int port, const string& ctrl_endpoint_path) :
+    _detail(new Detail(address, port, ctrl_endpoint_path)) {
+  }
+
   Server::Server(int port, const string& ctrl_endpoint_path) :
-    _detail(new Detail(port, ctrl_endpoint_path)) {
+    Server(default_address, port, ctrl_endpoint_path) {
   }
 
   Server::~Server() { // Required for pimpl pattern

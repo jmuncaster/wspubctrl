@@ -11,6 +11,7 @@ namespace wspubctrl {
   class Server {
     public:
       Server(int port = default_port, const std::string& ctrl_endpoint = default_ctrl_endpoint);
+      Server(const std::string& address, int port = default_port, const std::string& ctrl_endpoint = default_ctrl_endpoint);
       ~Server();
 
       // Start accepting connections
