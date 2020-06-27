@@ -21,9 +21,10 @@ Build with [cmake](cmake.org).
 
 ```bash
 $ mkdir build && cd build
-$ cmake -D BOOT_ROOT=/path/to/boost ..
+$ cmake -D BOOT_ROOT=/path/to/boost ..   # BOOST_ROOT not necessary if installed to default location
 $ cmake --build .
 ```
+(see below for how to build examples/tests)
 
 or, add this as a submodule or take a snapshot of the repository and in your CMakeLists.txt, add:
 
@@ -44,7 +45,7 @@ $ cmake -G "Visual Studio 14 2015 Win64" -D BOOST_ROOT='C:\path\to\boost' -D BUI
 $ cmake --build .
 ```
 
-### Example
+### Examples
 
 See `examples` directory.
 
