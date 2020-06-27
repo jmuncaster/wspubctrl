@@ -20,6 +20,7 @@ Dependencies:
 Build with [cmake](cmake.org).
 
 ```bash
+$ git submodule update --init --recursive  # Do this once
 $ mkdir build && cd build
 $ cmake -D BOOT_ROOT=/path/to/boost ..   # BOOST_ROOT not necessary if installed to default location
 $ cmake --build .
