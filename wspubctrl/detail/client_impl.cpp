@@ -29,7 +29,7 @@ namespace wspubctrl {
         _cnd.notify_one();
       };
 
-      _client.on_message = [this](ConnectionPtr connection, MessagePtr message) {
+      _client.on_message = [this](ConnectionPtr connection, InMessagePtr message) {
         unique_lock<mutex> lock(_mtx);
         _payload = message->string();
         _state = State::connected;
@@ -107,9 +107,7 @@ namespace wspubctrl {
         throw runtime_error("timeout: could not establish connection for request");
       }
 
-      auto send_stream = make_shared<SendStream>();
-      *send_stream << payload;
-      _connection->send(send_stream);
+      _connection->send(payload);
 
       if (timeout_ms == forever) {
         _cnd.wait(lock);

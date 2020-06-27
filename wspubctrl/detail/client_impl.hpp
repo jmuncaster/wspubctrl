@@ -12,8 +12,7 @@ namespace wspubctrl {
     using WsClient = SimpleWeb::SocketClient<SimpleWeb::WS>;
     typedef WsClient::Connection Connection;
     typedef std::shared_ptr<WsClient::Connection> ConnectionPtr;
-    typedef std::shared_ptr<WsClient::Message> MessagePtr;
-    typedef WsClient::SendStream SendStream;
+    typedef std::shared_ptr<WsClient::InMessage> InMessagePtr;
 
 
     class ClientImpl{
