@@ -15,8 +15,7 @@ using chrono::milliseconds;
 using WsServer = SimpleWeb::SocketServer<SimpleWeb::WS>;
 typedef WsServer::Connection Connection;
 typedef std::shared_ptr<WsServer::Connection> ConnectionPtr;
-typedef std::shared_ptr<WsServer::Message> MessagePtr;
-typedef WsServer::SendStream SendStream;
+typedef std::shared_ptr<WsServer::InMessage> InMessagePtr;
 
 namespace wspubctrl {
 
@@ -34,7 +33,7 @@ namespace wspubctrl {
       //  cout << "new connection to ctrl endpoint" << endl;
       //};
 
-      ctrl_endpoint.on_message = [this](ConnectionPtr connection, MessagePtr message) {
+      ctrl_endpoint.on_message = [this](ConnectionPtr connection, InMessagePtr message) {
         unique_lock<mutex> lock(_requests_mtx);
         _requests.push({connection, message});
         lock.unlock();
@@ -85,7 +84,7 @@ namespace wspubctrl {
     std::map<std::string, set<ConnectionPtr>> _subscribers;
     std::mutex _requests_mtx;
     std::condition_variable _requests_cv;
-    queue<pair<ConnectionPtr, MessagePtr>> _requests;
+    queue<pair<ConnectionPtr, InMessagePtr>> _requests;
     thread _thread;
   };
 
@@ -122,9 +121,7 @@ namespace wspubctrl {
       if (request_handler) {
         reply_payload = request_handler(message->string());
       }
-      auto send_stream = make_shared<SendStream>();
-      *send_stream << reply_payload;
-      connection->send(send_stream, [&](const SimpleWeb::error_code& ec) {}); // TODO: handle error
+      connection->send(reply_payload, [&](const SimpleWeb::error_code& ec) {}); // TODO: handle error
       return true;
     }
 
@@ -133,10 +130,8 @@ namespace wspubctrl {
 
   void Server::send(const string& endpoint_path, const string& payload) {
     auto& subscribers = _detail->_subscribers[endpoint_path];
-    auto send_stream = make_shared<SendStream>();
-    *send_stream << payload;
     for (auto& subscriber : subscribers) {
-      subscriber->send(send_stream, [&](const SimpleWeb::error_code& ec) {}); // TODO: handle error
+      subscriber->send(payload, [&](const SimpleWeb::error_code& ec) {}); // TODO: handle error
     }
   }
 

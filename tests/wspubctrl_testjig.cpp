@@ -19,16 +19,19 @@ string get_ts() {
 // Main server process runs a program loop, publishes feed, and checks for control messages
 void server_entry() {
   cout << "[Server " + get_ts() + "] Waiting for start message..." << endl;
-  wspubctrl::Server server;
+  wspubctrl::Server server(wspubctrl::default_port, wspubctrl::default_ctrl_endpoint);
+  server.add_publish_endpoint("/pub");
+  server.start();
+
   string server_data;
-  server.wait_for_request(-1, [&](const string& request) {
+  server.handle_request(-1, [&](const string& request) {
     server_data = "DATA(" + request + ")";
     return server_data;
   });
 
   while (!server_quit) {
     // Check for ctrl request
-    server.wait_for_request(0, [&](const string& request) {
+    server.handle_request(0, [&](const string& request) {
       cout << "[Server " << get_ts() << "]  req: " << request << endl;
       server_data = "DATA(" + request + ")";
       string reply = server_data;
@@ -39,16 +42,18 @@ void server_entry() {
     // Do some 'work' and publish
     this_thread::sleep_for(milliseconds(100));
     cout << "[Server " << get_ts() << "] data: " << server_data << endl;
-    server.publish_data(server_data);
+    server.send("/pub", server_data);
   }
   cout << "[Server " << get_ts() << "] thrd: quit" << endl;
 }
 
 // Subscribe thread just listens to the feed
 void sub_client_entry() {
-  wspubctrl::SubClient client;
+  auto sub_uri = string("localhost:") + to_string(wspubctrl::default_port) + "/pub";
+  wspubctrl::SubClient client(sub_uri);
+  client.connect();
   while (!client_quit) {
-    string data = client.wait_for_data(1000);
+    string data = client.poll(1000);
     if (!data.empty()) {
       cout << "[Sub    " << get_ts() << "] data: " << data << endl;
     }
@@ -62,7 +67,9 @@ void sub_client_entry() {
 // Control thread issue commands every few seconds
 void ctrl_client_entry() {
   int iter = 0;
-  wspubctrl::CtrlClient client;
+  auto ctrl_uri = string("localhost:") + to_string(wspubctrl::default_port) + wspubctrl::default_ctrl_endpoint;
+  wspubctrl::CtrlClient client(ctrl_uri);
+  client.connect();
   while (!client_quit) {
     try {
       string request = to_string(++iter);
