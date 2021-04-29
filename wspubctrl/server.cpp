@@ -77,7 +77,9 @@ namespace wspubctrl {
 
     void stop_thread() {
       _server.stop();
-      _thread.join();
+      if (_thread.joinable()) {
+        _thread.join();
+      }
     }
 
     WsServer _server;
