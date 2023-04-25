@@ -11,6 +11,9 @@ if (WIN32)
   target_compile_definitions(simple-websocket-server INTERFACE BOOST_ALL_NO_LIB)
 endif()
 
+# Prevent a build error with Boost 1.74+
+target_compile_definitions(simple-websocket-server INTERFACE -DBOOST_ASIO_USE_TS_EXECUTOR_AS_DEFAULT)
+
 # wspubctrl library
 add_library(wspubctrl
   wspubctrl/constants.hpp
